@@ -5,6 +5,7 @@
 *.hex
 *.hxl
 *.lib
+*.lpp
 *.lst
 *.obj
 *.p1

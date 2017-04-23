@@ -1,7 +1,8 @@
 /** @file System.c
- * Contain system-specific and program entry point routines.
+ * @see System.h for description.
  * @author Adrien RICCIARDI
  */
+#include <System.h>
 #include <xc.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -31,12 +32,6 @@
 #pragma config EBTRB = OFF // Disable boot block table read protection
 
 //-------------------------------------------------------------------------------------------------
-// Private constants
-//-------------------------------------------------------------------------------------------------
-/** Oscillator frequency in Hz (needed by software delay routines). */
-#define _XTAL_FREQ 64000000
-
-//-------------------------------------------------------------------------------------------------
 // Public functions
 //-------------------------------------------------------------------------------------------------
 void SystemInitialize(void)
@@ -46,21 +41,4 @@ void SystemInitialize(void)
 	while (!OSCCONbits.HFIOFS); // Wait for the internal oscillator to stabilize
 	OSCCON2 = 0x04; // Turn off secondary oscillator, enable primary oscillator drive circuit
 	OSCTUNEbits.PLLEN = 1; // Enable 4x PLL
-}
-
-void main(void)
-{
-	SystemInitialize();
-	
-	LATC = 0;
-	TRISC = 0;
-	
-	while (1)
-	{
-		LATC = ~PORTC;
-		__delay_ms(250);
-		__delay_ms(250);
-		__delay_ms(250);
-		__delay_ms(250);
-	}
 }
