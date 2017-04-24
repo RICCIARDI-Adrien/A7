@@ -3,6 +3,7 @@
  * @author Adrien RICCIARDI
  */
 #include <System.h>
+#include <System_Serial_Port.h>
 #include <xc.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -41,4 +42,7 @@ void SystemInitialize(void)
 	while (!OSCCONbits.HFIOFS); // Wait for the internal oscillator to stabilize
 	OSCCON2 = 0x04; // Turn off secondary oscillator, enable primary oscillator drive circuit
 	OSCTUNEbits.PLLEN = 1; // Enable 4x PLL
+	
+	// Initialize peripherals
+	SystemSerialPortInitialize();
 }

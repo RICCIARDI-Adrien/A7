@@ -1,11 +1,12 @@
 /** @file System.h
- * Contain system-specific and program entry point routines.
+ * Contain system-specific constants and program entry point routines. This is the only file an applications must include to get access to all system features.
  * @author Adrien RICCIARDI
  */
 #ifndef H_SYSTEM_H
 #define H_SYSTEM_H
 
 // Provide all needed includes
+#include <System_Serial_Port.h>
 #include <xc.h> // Provide microcontroller definitions
 
 //-------------------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@ CCFLAGS = --chip=18F26K22 --objdir=$(PATH_OBJECTS) --outdir=$(PATH_OBJECTS) -I..
 SOURCES = $(PATH_SOURCES)/Main.c
 
 all:
-	$(CC) $(CCFLAGS) $(SOURCES)
+	$(CC) $(CCFLAGS) $(SOURCES) -OFind_The_Number.hex
 	@cp $(PATH_OBJECTS)/Find_The_Number.hex $(PATH_BINARIES)
 	
 clean:
