@@ -9,7 +9,7 @@
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	unsigned char i, Inverted_Value, Value;
+	unsigned char i, Inverted_Value, Value, tmp;
 	
 	
 	SystemInitialize();
@@ -17,15 +17,19 @@ void main(void)
 	SystemSerialPortWriteString("aaa init string\r\n"); // Sending "aaa" first allows to use UART on RB6 and RB7 pins without being too bored by mikroProg on a Easy PIC 7 MikroElektronika board (value found by chance)
 	SystemSerialPortWriteString("This is a test string\r\n");
 	
-	LATB = 0;
-	TRISB = 0;
+	//LATB = 0;
+	//TRISB = 0;
 	while (1)
 	{
+		#if 0
 		// Wait for a character to be received
-		/*while (!PIR1bits.RC1IF);
+		while (!PIR1bits.RC1IF);
+		RCSTA1bits.CREN = 0;
+		
+		tmp = RCSTA1 & 0x01;
 		
 		Inverted_Value = RCREG1;
-		Value = 0;
+		/*Value = 0;
 		for (i = 0; i < 7; i++)
 		{
 			Value |= Inverted_Value & 1;
@@ -33,11 +37,19 @@ void main(void)
 			Value <<= 1;
 		}
 		LATB = Value;*/
-		//LATB = RCREG1;
+		//LATB = Inverted_Value;
 		
-		SystemSerialPortWriteString("bla ");
-		__delay_ms(500);
-		SystemSerialPortWriteString("blo ");
-		__delay_ms(500);
+		Inverted_Value >>= 1;
+		if (tmp) Inverted_Value |= 0x80;
+		SystemSerialPortWriteByte(Inverted_Value);
+		SystemSerialPortWriteByte(tmp);
+		SystemSerialPortWriteByte('\r');
+		SystemSerialPortWriteByte('\n');
+		
+		RCSTA1bits.CREN = 1;
+		
+		#endif
+		
+		SystemSerialPortWriteByte(SystemKeyboardReadCharacter());
 	}
 }

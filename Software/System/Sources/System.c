@@ -3,6 +3,8 @@
  * @author Adrien RICCIARDI
  */
 #include <System.h>
+#include <System_Interrupt.h>
+#include <System_Keyboard.h>
 #include <System_Serial_Port.h>
 #include <xc.h>
 
@@ -44,5 +46,9 @@ void SystemInitialize(void)
 	OSCTUNEbits.PLLEN = 1; // Enable 4x PLL
 	
 	// Initialize peripherals
+	SystemKeyboardInitialize();
 	SystemSerialPortInitialize();
+	
+	// Initialize and enable interrupts
+	SystemInterruptInitialize();
 }
