@@ -14,7 +14,7 @@ static unsigned char System_Keyboard_Received_Character;
 static volatile unsigned char System_Keyboard_Is_Key_Available = 0;
 
 /** Characters issued when no modifier key is pressed (AZERTY mapping). */
-static unsigned char System_Keyboard_Normal_Characters[] =
+static unsigned char System_Keyboard_Lowercase_Characters[] =
 {
 	0, // Offset 0
 	SYSTEM_KEYBOARD_KEY_CODE_F9, // Offset 0x01
@@ -34,7 +34,7 @@ static unsigned char System_Keyboard_Normal_Characters[] =
 	0, // Offset 0x0F
 	0, // Offset 0x10
 	SYSTEM_KEYBOARD_KEY_CODE_LEFT_ALT, // 0x11
-	SYSTEM_KEYBOARD_KEY_CODE_LEFT_SHIFT, // 0x12
+	0, // 0x12
 	0, // Offset 0x13
 	SYSTEM_KEYBOARD_KEY_CODE_LEFT_CONTROL, // Offset 0x14
 	'a', // Offset 0x15
@@ -146,6 +146,139 @@ static unsigned char System_Keyboard_Normal_Characters[] =
 	0 // Offset 0x7F
 };
 
+/** Characters issued when shift is pressed or CAPS LOCK is set (AZERTY mapping). */
+static unsigned char System_Keyboard_Uppercase_Characters[] =
+{
+	0, // Offset 0
+	SYSTEM_KEYBOARD_KEY_CODE_F9, // Offset 0x01
+	0, // Offset 0x02
+	SYSTEM_KEYBOARD_KEY_CODE_F5, // Offset 0x03
+	SYSTEM_KEYBOARD_KEY_CODE_F3, // Offset 0x04
+	SYSTEM_KEYBOARD_KEY_CODE_F1, // Offset 0x05
+	SYSTEM_KEYBOARD_KEY_CODE_F2, // Offset 0x06
+	SYSTEM_KEYBOARD_KEY_CODE_F12, // Offset 0x07
+	0, // Offset 0x08
+	SYSTEM_KEYBOARD_KEY_CODE_F10, // Offset 0x09
+	SYSTEM_KEYBOARD_KEY_CODE_F8, // Offset 0x0A
+	SYSTEM_KEYBOARD_KEY_CODE_F6, // Offset 0x0B
+	SYSTEM_KEYBOARD_KEY_CODE_F4, // Offset 0x0C
+	'\t', // Offset 0x0D
+	'`', // Offset 0x0E
+	0, // Offset 0x0F
+	0, // Offset 0x10
+	SYSTEM_KEYBOARD_KEY_CODE_LEFT_ALT, // 0x11
+	0, // 0x12
+	0, // Offset 0x13
+	SYSTEM_KEYBOARD_KEY_CODE_LEFT_CONTROL, // Offset 0x14
+	'A', // Offset 0x15
+	'1', // Offset 0x16
+	0, // Offset 0x17
+	0, // Offset 0x18
+	0, // Offset 0x19
+	'W', // Offset 0x1A
+	'S', // Offset 0x1B
+	'Q', // Offset 0x1C
+	'Z', // Offset 0x1D
+	'2', // Offset 0x1E
+	0, // Offset 0x1F (TODO E0, no confict)
+	0, // Offset 0x20
+	'C', // Offset 0x21
+	'X', // Offset 0x22
+	'D', // Offset 0x23
+	'E', // Offset 0x24
+	'4', // Offset 0x25
+	'3', // Offset 0x26
+	0, // Offset 0x27 (TODO E0, no conflict)
+	0, // Offset 0x28
+	' ', // Offset 0x29
+	'V', // Offset 0x2A
+	'F', // Offset 0x2B
+	'T', // Offset 0x2C
+	'R', // Offset 0x2D
+	'5', // Offset 0x2E
+	0, // Offset 0x2F (TODO E0, no conflict, DO NOT MAP (mouse right-click menu key)
+	0, // Offset 0x30
+	'N', // Offset 0x31
+	'B', // Offset 0x32
+	'H', // Offset 0x33
+	'G', // Offset 0x34
+	'Y', // Offset 0x35
+	'6', // Offset 0x36
+	0, // Offset 0x37
+	0, // Offset 0x38
+	0, // Offset 0x39
+	'?', // Offset 0x3A
+	'J', // Offset 0x3B
+	'U', // Offset 0x3C
+	'7', // Offset 0x3D
+	'8', // Offset 0x3E
+	0, // Offset 0x3F
+	0, // Offset 0x40
+	'.', // Offset 0x41
+	'K', // Offset 0x42
+	'I', // Offset 0x43
+	'O', // Offset 0x44
+	'0', // Offset 0x45
+	'9', // Offset 0x46
+	0, // Offset 0x47
+	0, // Offset 0x48
+	'/', // Offset 0x49
+	'\025', // Offset 0x4A
+	'L', // Offset 0x4B
+	'M', // Offset 0x4C
+	'P', // Offset 0x4D
+	'\247', // Offset 0x4E
+	0, // Offset 0x4F
+	0, // Offset 0x50
+	0, // Offset 0x51
+	'%', // Offset 0x52
+	0, // Offset 0x53
+	0, // Offset 0x54
+	'+', // Offset 0x55
+	0, // Offset 0x56
+	0, // Offset 0x57
+	SYSTEM_KEYBOARD_KEY_CODE_CAPITALS_LOCK, // Offset 0x58
+	0, // Offset 0x59 (TODO right shift)
+	'\n', // Offset 0x5A
+	'\234', // Offset 0x5B
+	0, // Offset 0x5C
+	'\346', // Offset 0x5D
+	0, // Offset 0x5E
+	0, // Offset 0x5F
+	0, // Offset 0x60
+	0, // Offset 0x61
+	0, // Offset 0x62
+	0, // Offset 0x63
+	0, // Offset 0x64
+	0, // Offset 0x65
+	'\b', // Offset 0x66
+	0, // Offset 0x67
+	0, // Offset 0x68
+	'1', // Offset 0x69 (TODO also END)
+	0, // Offset 0x6A
+	'4', // Offset 0x6B (TODO also left arrow)
+	'7', // Offset 0x6C (TODO also HOME)
+	0, // Offset 0x6D
+	0, // Offset 0x6E
+	0, // Offset 0x6F
+	'0', // Offset 0x70 (TODO also INSERT)
+	'.', // Offset 0x71 (TODO also DELETE)
+	'2', // Offset 0x72 (TODO also down arrow)
+	'5', // Offset 0x73
+	'6', // Offset 0x74 (TODO also right arrow)
+	'8', // Offset 0x75 (TODO also up arrow)
+	27, // Offset 0x76
+	0, // Offset 0x77
+	SYSTEM_KEYBOARD_KEY_CODE_F11, // Offset 0x78
+	'+', // Offset 0x79
+	'3', // Offset 0x7A (TODO also PAGE DOWN)
+	'-', // Offset 0x7B
+	'*', // Offset 0x7C
+	'9', // Offset 0x7D (TODO also PAGE UP)
+	0, // Offset 0x7E
+	0 // Offset 0x7F
+};
+
 //-------------------------------------------------------------------------------------------------
 // Public functions
 //-------------------------------------------------------------------------------------------------
@@ -171,7 +304,7 @@ void SystemKeyboardInitialize(void)
 
 void SystemKeyboardUARTInterruptHandler(void)
 {
-	static unsigned char Is_Break_Code_Received = 0, Is_Extended_Code_Received = 0;
+	static unsigned char Is_Break_Code_Received = 0, Is_Extended_Code_Received = 0, Is_Left_Shift_Pressed = 0, Is_Right_Shift_Pressed = 0;
 	unsigned char Received_Byte, Is_Most_Significant_Bit_Set, Is_Extended_Character_Replaced = 1;
 	
 	// Immediately stop UART reception to avoid shifting the remaining bit, which would corrupt the next received byte
@@ -208,6 +341,10 @@ void SystemKeyboardUARTInterruptHandler(void)
 	{
 		Is_Break_Code_Received = 0;
 		Is_Extended_Code_Received = 0; // Also reset extended code flag in case it was an extended key break code that was just discarded
+		
+		// Are the shift keys released ?
+		if (Received_Byte == 0x12) Is_Left_Shift_Pressed = 0;
+		if (Received_Byte == 0x59) Is_Right_Shift_Pressed = 0;
 		return;
 	}
 	
@@ -237,10 +374,18 @@ void SystemKeyboardUARTInterruptHandler(void)
 		if (Is_Extended_Character_Replaced) System_Keyboard_Is_Key_Available = 1;
 	}		
 	// This is a normal code, get its translation from the table
-	else if (Received_Byte < sizeof(System_Keyboard_Normal_Characters)) // Make sure the key is not out of the table bounds
+	else if (Received_Byte < sizeof(System_Keyboard_Lowercase_Characters)) // Make sure the key is not out of the table bounds (all tables have same size)
 	{
-		System_Keyboard_Received_Character = System_Keyboard_Normal_Characters[Received_Byte];
-		System_Keyboard_Is_Key_Available = 1;
+		// Handle special control characters
+		if (Received_Byte == 0x12) Is_Left_Shift_Pressed = 1;
+		else if (Received_Byte == 0x59) Is_Right_Shift_Pressed = 1;
+		else
+		{
+			// Select the right case size
+			if (Is_Left_Shift_Pressed || Is_Right_Shift_Pressed) System_Keyboard_Received_Character = System_Keyboard_Uppercase_Characters[Received_Byte];
+			else System_Keyboard_Received_Character = System_Keyboard_Lowercase_Characters[Received_Byte];
+			System_Keyboard_Is_Key_Available = 1;
+		}
 	}
 }
 

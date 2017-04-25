@@ -36,7 +36,7 @@
 /** "Left alt" key virtual key code. */
 #define SYSTEM_KEYBOARD_KEY_CODE_LEFT_ALT 242
 /** "Left shift" key virtual key code. */
-#define SYSTEM_KEYBOARD_KEY_CODE_LEFT_SHIFT 241
+#define SYSTEM_KEYBOARD_KEY_CODE_LEFT_SHIFT 241 // TODO really useful for application ?
 /** "Left control" key virtual key code. */
 #define SYSTEM_KEYBOARD_KEY_CODE_LEFT_CONTROL 240
 /** "Caps lock" key virtual key code. */
