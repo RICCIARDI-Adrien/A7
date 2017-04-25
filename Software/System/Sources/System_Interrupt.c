@@ -1,5 +1,5 @@
 /** @file System_Interrupt.c
- * 
+ * @see System_Interrupt.h for description.
  * @author Adrien RICCIARDI
  */
 #include <System_Keyboard.h>

@@ -13,6 +13,139 @@ static unsigned char System_Keyboard_Last_Make_Code;
 /** Tell if a new unread key is available. */
 static volatile unsigned char System_Keyboard_Is_Key_Available = 0;
 
+/** Characters issued when no modifier key is pressed (AZERTY mapping). */
+static unsigned char System_Keyboard_Normal_Characters[] =
+{
+	0, // Offset 0
+	SYSTEM_KEYBOARD_KEY_CODE_F9, // Offset 0x01
+	0, // Offset 0x02
+	SYSTEM_KEYBOARD_KEY_CODE_F5, // Offset 0x03
+	SYSTEM_KEYBOARD_KEY_CODE_F3, // Offset 0x04
+	SYSTEM_KEYBOARD_KEY_CODE_F1, // Offset 0x05
+	SYSTEM_KEYBOARD_KEY_CODE_F2, // Offset 0x06
+	SYSTEM_KEYBOARD_KEY_CODE_F12, // Offset 0x07
+	0, // Offset 0x08
+	SYSTEM_KEYBOARD_KEY_CODE_F10, // Offset 0x09
+	SYSTEM_KEYBOARD_KEY_CODE_F8, // Offset 0x0A
+	SYSTEM_KEYBOARD_KEY_CODE_F6, // Offset 0x0B
+	SYSTEM_KEYBOARD_KEY_CODE_F4, // Offset 0x0C
+	'\t', // Offset 0x0D
+	'`', // Offset 0x0E
+	0, // Offset 0x0F
+	0, // Offset 0x10
+	SYSTEM_KEYBOARD_KEY_CODE_LEFT_ALT, // 0x11
+	SYSTEM_KEYBOARD_KEY_CODE_LEFT_SHIFT, // 0x12
+	0, // Offset 0x13
+	SYSTEM_KEYBOARD_KEY_CODE_LEFT_CONTROL, // Offset 0x14
+	'a', // Offset 0x15
+	'&', // Offset 0x16
+	0, // Offset 0x17
+	0, // Offset 0x18
+	0, // Offset 0x19
+	'w', // Offset 0x1A
+	's', // Offset 0x1B
+	'q', // Offset 0x1C
+	'z', // Offset 0x1D
+	'\202', // Offset 0x1E
+	0, // Offset 0x1F (TODO E0, no confict)
+	0, // Offset 0x20
+	'c', // Offset 0x21
+	'x', // Offset 0x22
+	'd', // Offset 0x23
+	'e', // Offset 0x24
+	'\'', // Offset 0x25
+	'\"', // Offset 0x26
+	0, // Offset 0x27 (TODO E0, no conflict)
+	0, // Offset 0x28
+	' ', // Offset 0x29
+	'v', // Offset 0x2A
+	'f', // Offset 0x2B
+	't', // Offset 0x2C
+	'r', // Offset 0x2D
+	'(', // Offset 0x2E
+	0, // Offset 0x2F (TODO E0, no conflict, DO NOT MAP (mouse right-click menu key)
+	0, // Offset 0x30
+	'n', // Offset 0x31
+	'b', // Offset 0x32
+	'h', // Offset 0x33
+	'g', // Offset 0x34
+	'y', // Offset 0x35
+	'-', // Offset 0x36
+	0, // Offset 0x37
+	0, // Offset 0x38
+	0, // Offset 0x39
+	',', // Offset 0x3A
+	'j', // Offset 0x3B
+	'u', // Offset 0x3C
+	'\212', // Offset 0x3D
+	'_', // Offset 0x3E
+	0, // Offset 0x3F
+	0, // Offset 0x40
+	';', // Offset 0x41
+	'k', // Offset 0x42
+	'i', // Offset 0x43
+	'o', // Offset 0x44
+	'\205', // Offset 0x45
+	'\135', // Offset 0x46
+	0, // Offset 0x47
+	0, // Offset 0x48
+	':', // Offset 0x49
+	'!', // Offset 0x4A
+	'l', // Offset 0x4B
+	'm', // Offset 0x4C
+	'p', // Offset 0x4D
+	')', // Offset 0x4E
+	0, // Offset 0x4F
+	0, // Offset 0x50
+	0, // Offset 0x51
+	'\227', // Offset 0x52
+	0, // Offset 0x53
+	'^', // Offset 0x54
+	'=', // Offset 0x55
+	0, // Offset 0x56
+	0, // Offset 0x57
+	SYSTEM_KEYBOARD_KEY_CODE_CAPITALS_LOCK, // Offset 0x58
+	0, // Offset 0x59 (TODO right shift)
+	'\n', // Offset 0x5A
+	'$', // Offset 0x5B
+	0, // Offset 0x5C
+	'*', // Offset 0x5D
+	0, // Offset 0x5E
+	0, // Offset 0x5F
+	0, // Offset 0x60
+	0, // Offset 0x61
+	0, // Offset 0x62
+	0, // Offset 0x63
+	0, // Offset 0x64
+	0, // Offset 0x65
+	'\b', // Offset 0x66
+	0, // Offset 0x67
+	0, // Offset 0x68
+	'1', // Offset 0x69 (TODO also END)
+	0, // Offset 0x6A
+	'4', // Offset 0x6B (TODO also left arrow)
+	'7', // Offset 0x6C (TODO also HOME)
+	0, // Offset 0x6D
+	0, // Offset 0x6E
+	0, // Offset 0x6F
+	'0', // Offset 0x70 (TODO also INSERT)
+	'.', // Offset 0x71 (TODO also DELETE)
+	'2', // Offset 0x72 (TODO also down arrow)
+	'5', // Offset 0x73
+	'6', // Offset 0x74 (TODO also right arrow)
+	'8', // Offset 0x75 (TODO also up arrow)
+	27, // Offset 0x76
+	0, // Offset 0x77
+	SYSTEM_KEYBOARD_KEY_CODE_F11, // Offset 0x78
+	'+', // Offset 0x79
+	'3', // Offset 0x7A (TODO also PAGE DOWN)
+	'-', // Offset 0x7B
+	'*', // Offset 0x7C
+	'9', // Offset 0x7D (TODO also PAGE UP)
+	0, // Offset 0x7E
+	0 // Offset 0x7F
+};
+
 //-------------------------------------------------------------------------------------------------
 // Public functions
 //-------------------------------------------------------------------------------------------------
@@ -93,6 +226,9 @@ unsigned char SystemKeyboardReadCharacter(void)
 	while (!System_Keyboard_Is_Key_Available);
 	System_Keyboard_Is_Key_Available = 0;
 	
-	// TODO return corresponding table entry
-	return System_Keyboard_Last_Make_Code;
+	// Make sure the key is not out of the table bounds
+	if (System_Keyboard_Last_Make_Code >= sizeof(System_Keyboard_Normal_Characters)) return 0;
+	
+	// Return the character corresponding to the make code
+	return System_Keyboard_Normal_Characters[System_Keyboard_Last_Make_Code];
 }
