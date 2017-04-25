@@ -8,8 +8,8 @@
 //-------------------------------------------------------------------------------------------------
 // Private variables
 //-------------------------------------------------------------------------------------------------
-/** The last received key make code. */
-static unsigned char System_Keyboard_Last_Make_Code;
+/** The last received character. */
+static unsigned char System_Keyboard_Received_Character;
 /** Tell if a new unread key is available. */
 static volatile unsigned char System_Keyboard_Is_Key_Available = 0;
 
@@ -171,8 +171,8 @@ void SystemKeyboardInitialize(void)
 
 void SystemKeyboardUARTInterruptHandler(void)
 {
-	static unsigned char Is_Break_Code_Received = 0; // Tell if the 0xF0 break code has been previously received or not
-	unsigned char Received_Byte, Is_Most_Significant_Bit_Set;
+	static unsigned char Is_Break_Code_Received = 0, Is_Extended_Code_Received = 0;
+	unsigned char Received_Byte, Is_Most_Significant_Bit_Set, Is_Extended_Character_Replaced = 1;
 	
 	// Immediately stop UART reception to avoid shifting the remaining bit, which would corrupt the next received byte
 	RCSTA1bits.CREN = 0;
@@ -189,6 +189,13 @@ void SystemKeyboardUARTInterruptHandler(void)
 	TMR6 = 0; // Initialize timer (TMR6 register value must match PR6 register value to generate an overflow, but PR6 is automatically initialized to 256, so no need to set its value)
 	T6CON = 0x07; // Select a 1:1 postscaler, enable timer, select a 1:16 prescaler (timer overflow time = ((Fosc / 4) / Prescaler) / 256) = 256us
 	
+	// Is it the extended key code ?
+	if (Received_Byte == 0xE0)
+	{
+		Is_Extended_Code_Received = 1;
+		return;
+	}
+	
 	// Is it the break code ?
 	if (Received_Byte == 0xF0)
 	{
@@ -200,12 +207,41 @@ void SystemKeyboardUARTInterruptHandler(void)
 	if (Is_Break_Code_Received)
 	{
 		Is_Break_Code_Received = 0;
+		Is_Extended_Code_Received = 0; // Also reset extended code flag in case it was an extended key break code that was just discarded
 		return;
 	}
 	
-	// Keep the make code (the corresponding ASCII symbol will be retrieved when the user wants to read a key, saving some cycles in the interrupt)
-	System_Keyboard_Last_Make_Code = Received_Byte;
-	System_Keyboard_Is_Key_Available = 1;
+	// Keep only some extended characters (avoid loosing a whole dedicated table space in RAM)
+	if (Is_Extended_Code_Received)
+	{
+		Is_Extended_Code_Received = 0;
+		
+		switch (Received_Byte)
+		{
+			// Key pad '/'
+			case 0x4A:
+				System_Keyboard_Received_Character = '/';
+				break;
+				
+			// Key pad enter
+			case 0x5A:
+				System_Keyboard_Received_Character = '\n';
+				break;
+				
+			// In all other case the character was not replaced
+			default:
+				Is_Extended_Character_Replaced = 0;
+				break;
+		}
+		
+		if (Is_Extended_Character_Replaced) System_Keyboard_Is_Key_Available = 1;
+	}		
+	// This is a normal code, get its translation from the table
+	else if (Received_Byte < sizeof(System_Keyboard_Normal_Characters)) // Make sure the key is not out of the table bounds
+	{
+		System_Keyboard_Received_Character = System_Keyboard_Normal_Characters[Received_Byte];
+		System_Keyboard_Is_Key_Available = 1;
+	}
 }
 
 void SystemKeyboardTimerInterruptHandler(void)
@@ -226,9 +262,5 @@ unsigned char SystemKeyboardReadCharacter(void)
 	while (!System_Keyboard_Is_Key_Available);
 	System_Keyboard_Is_Key_Available = 0;
 	
-	// Make sure the key is not out of the table bounds
-	if (System_Keyboard_Last_Make_Code >= sizeof(System_Keyboard_Normal_Characters)) return 0;
-	
-	// Return the character corresponding to the make code
-	return System_Keyboard_Normal_Characters[System_Keyboard_Last_Make_Code];
+	return System_Keyboard_Received_Character;
 }
