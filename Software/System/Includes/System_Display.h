@@ -11,4 +11,7 @@
 /** Reset and configure the graphic display for operations. */
 void SystemDisplayInitialize(void);
 
+/** Clear the display. */
+void SystemDisplayClear(void);
+
 #endif

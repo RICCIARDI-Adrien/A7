@@ -132,7 +132,7 @@ static void SystemDisplayWriteByte(unsigned char Is_Second_Controller_Selected, 
 //-------------------------------------------------------------------------------------------------
 void SystemDisplayInitialize(void)
 {
-	unsigned char Controller_ID, Row, Column;
+	unsigned char Controller_ID;
 	
 	// Configure pins as outputs
 	// Set pins as digital
@@ -150,6 +150,15 @@ void SystemDisplayInitialize(void)
 	__delay_ms(50); // A so huge value should be enough
 	
 	// Configure both controllers
+	SystemDisplayClear();
+	for (Controller_ID = 0; Controller_ID < 2; Controller_ID++) SystemDisplayWriteByte(Controller_ID, 1, 0x3F); // Turn display on
+}
+
+void SystemDisplayClear(void)
+{
+	unsigned char Controller_ID, Row, Column;
+	
+	// Access all controllers
 	for (Controller_ID = 0; Controller_ID < 2; Controller_ID++)
 	{
 		// Turn off all pixels
@@ -164,8 +173,5 @@ void SystemDisplayInitialize(void)
 			// Clear all pixels
 			for (Column = 0; Column < 64; Column++) SystemDisplayWriteByte(Controller_ID, 0, 0);
 		}
-		
-		// Turn display on
-		SystemDisplayWriteByte(Controller_ID, 1, 0x3F);
 	}
 }
