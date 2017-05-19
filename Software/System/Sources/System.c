@@ -3,6 +3,7 @@
  * @author Adrien RICCIARDI
  */
 #include <System.h>
+#include <System_Display.h>
 #include <System_Interrupt.h>
 #include <System_Keyboard.h>
 #include <System_Serial_Port.h>
@@ -48,6 +49,7 @@ void SystemInitialize(void)
 	// Initialize peripherals
 	SystemKeyboardInitialize();
 	SystemSerialPortInitialize();
+	SystemDisplayInitialize();
 	
 	// Initialize and enable interrupts
 	SystemInterruptInitialize();
