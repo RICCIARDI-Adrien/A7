@@ -14,4 +14,9 @@ void SystemDisplayInitialize(void);
 /** Clear the display. */
 void SystemDisplayClear(void);
 
+/** Clear the internal frame buffer. This is the first rendering function that should be called in the rendering loop. */
+void SystemDisplayBeginRendering(void);
+/** Send the frame buffer content to the display. This is the last rendering function called in the rendering loop. */
+void SystemDisplayEndRendering(void);
+
 #endif

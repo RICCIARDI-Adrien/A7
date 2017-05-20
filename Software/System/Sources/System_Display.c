@@ -28,6 +28,12 @@
 #define SYSTEM_DISPLAY_STATUS_REGISTER_BUSY_FLAG_BIT_MASK 0x80
 
 //-------------------------------------------------------------------------------------------------
+// Private variables
+//-------------------------------------------------------------------------------------------------
+/** Hold the display picture. All drawing operations can be done in RAM then the final picture sent to the display to save a lot of time. */
+/*static*/ unsigned char System_Display_Frame_Buffer[1024];  // TEST
+
+//-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
 /** Poll the specified controller "busy flag" and exit when the flag is cleared.
@@ -174,4 +180,52 @@ void SystemDisplayClear(void)
 			for (Column = 0; Column < 64; Column++) SystemDisplayWriteByte(Controller_ID, 0, 0);
 		}
 	}
+}
+
+void SystemDisplayBeginRendering(void)
+{
+	unsigned short i;
+	
+	// Clear frame buffer (no need to clear the display because it will be fully overwritten by the frame buffer content)
+	for (i = 0; i < sizeof(System_Display_Frame_Buffer); i++) System_Display_Frame_Buffer[i] = 0;
+}
+
+void SystemDisplayEndRendering(void)
+{
+	unsigned char Controller_ID, Row, Column;
+	unsigned short i = 0;
+	
+	// Draw the row of the first controller then the row of the second to allow the frame array buffer to be read linearly
+	for (Row = 0; Row < 8; Row++)
+	{
+		// Access all controllers
+		for (Controller_ID = 0; Controller_ID < 2; Controller_ID++)
+		{
+			// Set row number
+			SystemDisplayWriteByte(Controller_ID, 1, 0xB8 | Row);
+			
+			// Make column number start from zero
+			SystemDisplayWriteByte(Controller_ID, 1, 0x40);
+			
+			// Display the row
+			for (Column = 0; Column < 64; Column++)
+			{
+				SystemDisplayWriteByte(Controller_ID, 0, System_Display_Frame_Buffer[i]);
+				i++;
+			}
+		}
+	}
+}
+
+void bla(void)
+{
+	/*__delay_ms(2000);
+	SystemDisplayWriteByte(0, 1, 0x3E);
+	__delay_ms(2000);
+	SystemDisplayWriteByte(0, 1, 0x3F);
+	__delay_ms(2000);*/
+	//__delay_ms(200);
+	SystemDisplayWriteByte(0, 0, 0xa5);
+//	__delay_ms(200);
+	SystemDisplayWriteByte(0, 0, 0x31);
 }

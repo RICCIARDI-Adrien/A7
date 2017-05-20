@@ -4,12 +4,16 @@
  */
 #include <System.h>
 
+void bla(void);
+extern unsigned char System_Display_Frame_Buffer[512];
+
 //-------------------------------------------------------------------------------------------------
 // Entry point
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
 	unsigned char i, Inverted_Value, Value, tmp;
+	signed short x = 0, y = 0, Vertical_Speed = 8, Horizontal_Speed = 1;
 	
 	
 	SystemInitialize();
@@ -50,6 +54,52 @@ void main(void)
 		
 		#endif
 		
+		#if 0
 		SystemSerialPortWriteByte(SystemKeyboardReadCharacter());
+		#endif
+		
+		SystemDisplayBeginRendering();
+		
+		/*System_Display_Frame_Buffer[0] = 0xAA;
+		System_Display_Frame_Buffer[127] = 0x55;
+		System_Display_Frame_Buffer[128] = 0xCC;*/
+		
+		System_Display_Frame_Buffer[y * 128 + x] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 1] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 2] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 3] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 4] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 5] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 6] = 0xFF;
+		System_Display_Frame_Buffer[y * 128 + x + 7] = 0xFF;
+		
+		SystemDisplayEndRendering();
+		__delay_ms(66);
+	//__delay_ms(1000);
+		
+		x += Vertical_Speed;
+		y += Horizontal_Speed;
+		
+		if (x >= 120)
+		{
+			x = 119;
+			Vertical_Speed = -8;
+		}
+		else if (x < 0)
+		{
+			x = 0;
+			Vertical_Speed = 8;
+		}
+		
+		if (y >= 8)
+		{
+			y = 7;
+			Horizontal_Speed = -1;
+		}
+		else if (y < 0)
+		{
+			y = 0;
+			Horizontal_Speed = 1;
+		}
 	}
 }
