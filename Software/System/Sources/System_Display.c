@@ -31,7 +31,7 @@
 // Private variables
 //-------------------------------------------------------------------------------------------------
 /** Hold the display picture. All drawing operations can be done in RAM then the final picture sent to the display to save a lot of time. */
-/*static*/ unsigned char System_Display_Frame_Buffer[1024];  // TEST
+static unsigned char System_Display_Frame_Buffer[SYSTEM_DISPLAY_WIDTH * SYSTEM_DISPLAY_HEIGHT / 8];
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -168,7 +168,7 @@ void SystemDisplayClear(void)
 	for (Controller_ID = 0; Controller_ID < 2; Controller_ID++)
 	{
 		// Turn off all pixels
-		for (Row = 0; Row < 8; Row++)
+		for (Row = 0; Row < SYSTEM_DISPLAY_HEIGHT / 8; Row++)
 		{
 			// Set row number
 			SystemDisplayWriteByte(Controller_ID, 1, 0xB8 | Row);
@@ -177,7 +177,7 @@ void SystemDisplayClear(void)
 			SystemDisplayWriteByte(Controller_ID, 1, 0x40);
 			
 			// Clear all pixels
-			for (Column = 0; Column < 64; Column++) SystemDisplayWriteByte(Controller_ID, 0, 0);
+			for (Column = 0; Column < SYSTEM_DISPLAY_WIDTH / 2; Column++) SystemDisplayWriteByte(Controller_ID, 0, 0);
 		}
 	}
 }
@@ -196,7 +196,7 @@ void SystemDisplayEndRendering(void)
 	unsigned short i = 0;
 	
 	// Draw the row of the first controller then the row of the second to allow the frame array buffer to be read linearly
-	for (Row = 0; Row < 8; Row++)
+	for (Row = 0; Row < SYSTEM_DISPLAY_HEIGHT / 8; Row++) // A row is composed of 8 vertical pixels (stored in one byte)
 	{
 		// Access all controllers
 		for (Controller_ID = 0; Controller_ID < 2; Controller_ID++)
@@ -208,7 +208,7 @@ void SystemDisplayEndRendering(void)
 			SystemDisplayWriteByte(Controller_ID, 1, 0x40);
 			
 			// Display the row
-			for (Column = 0; Column < 64; Column++)
+			for (Column = 0; Column < SYSTEM_DISPLAY_WIDTH / 2; Column++) // Each controller handle half display width
 			{
 				SystemDisplayWriteByte(Controller_ID, 0, System_Display_Frame_Buffer[i]);
 				i++;
@@ -217,15 +217,43 @@ void SystemDisplayEndRendering(void)
 	}
 }
 
-void bla(void)
+void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned char *Pointer_Sprite_Pixels, unsigned char Width, unsigned char Height)
 {
-	/*__delay_ms(2000);
-	SystemDisplayWriteByte(0, 1, 0x3E);
-	__delay_ms(2000);
-	SystemDisplayWriteByte(0, 1, 0x3F);
-	__delay_ms(2000);*/
-	//__delay_ms(200);
-	SystemDisplayWriteByte(0, 0, 0xa5);
-//	__delay_ms(200);
-	SystemDisplayWriteByte(0, 0, 0x31);
+	unsigned char *Pointer_Frame_Buffer, Y_Remainder, Y_Quotient, Sprite_Pixels;
+	
+	// Cache Y divided by 8 operation result
+	Y_Quotient = Y >> 3;
+	Y_Remainder = Y - (Y_Quotient << 3); // If the remainder is 0, the sprite vertical coordinate is aligned with the frame buffer row, if not, some shifting must be done
+	
+	// Compute the location in the frame buffer where the sprite must be drawn
+	Pointer_Frame_Buffer = (unsigned char *) (System_Display_Frame_Buffer + (Y_Quotient * SYSTEM_DISPLAY_WIDTH + X)); // Each frame buffer row contains 8 pixels rows, so divide Y by 8
+	
+	// A whole byte contains the pixels for 8 consecutive vertical rows, so adjust height to talk in bytes to make drawing operation easier and faster
+	Height >>= 3; // Due to display module hardware, height is always a multiple of 8
+	
+	// XOR the sprite bits with the current one in the frame buffer
+	for (Y = 0; Y < Height; Y++) // Y variable is not needed anymore, recycle it
+	{
+		for (X = 0; X < Width; X++) // X variable is not needed anymore, recycle it
+		{
+			if (Y_Remainder != 0)
+			{
+				// Cache sprite pixels value
+				Sprite_Pixels = *Pointer_Sprite_Pixels;
+				
+				// Draw the begining of the sprite row on the current frame buffer row
+				*Pointer_Frame_Buffer ^= Sprite_Pixels << Y_Remainder;
+				// Draw the end of the sprite row on the next frame buffer row
+				*(Pointer_Frame_Buffer + SYSTEM_DISPLAY_WIDTH) ^= (Sprite_Pixels >> (8 - Y_Remainder));
+			}
+			// Sprite vertical coordinate is aligned with display rows, there is just need to copy the sprite content
+			else *Pointer_Frame_Buffer ^= *Pointer_Sprite_Pixels;
+			
+			Pointer_Frame_Buffer++;
+			Pointer_Sprite_Pixels++;
+		}
+		
+		// Go to next frame buffer row
+		Pointer_Frame_Buffer += SYSTEM_DISPLAY_WIDTH - Width; // "Width" bytes have been written yet, subtract them
+	}
 }
