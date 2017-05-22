@@ -63,6 +63,7 @@ void main(void)
 	
 	while (1)
 	{
+		SystemDisplayStartFrameTimer();
 		SystemDisplayBeginRendering();
 		
 		// Handle ball moves
@@ -104,6 +105,6 @@ void main(void)
 		}
 		
 		SystemDisplayEndRendering();
-		__delay_ms(50);
+		SystemDisplayWaitForFrameTimerEnd();
 	}
 }
