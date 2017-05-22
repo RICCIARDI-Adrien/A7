@@ -36,4 +36,11 @@ void SystemDisplayEndRendering(void);
  */
 void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned char *Pointer_Sprite_Pixels, unsigned char Width, unsigned char Height);
 
+/** Start a timer lasting a frame time. */
+void SystemDisplayStartFrameTimer(void);
+/** Wait for the frame timer to elapse. This timer allows to make all frames duration equal, even if the frame computation time varies. 
+ * @note This function immediately returns if the frame lasted too long (i.e. system can't keep up).
+ */
+void SystemDisplayWaitForFrameTimerEnd(void);
+
 #endif

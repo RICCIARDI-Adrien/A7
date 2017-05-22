@@ -27,6 +27,9 @@
 /** The busy flag bit in the status register. */
 #define SYSTEM_DISPLAY_STATUS_REGISTER_BUSY_FLAG_BIT_MASK 0x80
 
+/** Set the frame timer to have 20 frames per second. */
+#define SYSTEM_DISPLAY_FRAME_COUNTER_PRELOAD_VALUE (65335 - 50000) // Frequency_Division_Factor = Fosc / 4 / Prescaler_Value / Requested_Frames_Per_Seconds = Fosc / 4 / 8 / 20 = 50000. As the timer can only increment, it must be preloaded with its maximum value (65535) minus the found frequency division factor, so the timer can overflow at the requested time
+
 //-------------------------------------------------------------------------------------------------
 // Private variables
 //-------------------------------------------------------------------------------------------------
@@ -236,6 +239,7 @@ void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned 
 	{
 		for (X = 0; X < Width; X++) // X variable is not needed anymore, recycle it
 		{
+			// Sprite vertical coordinate is not aligned withe display row, sprite 8 vertical pixels must be shifted on this display row and the next one
 			if (Y_Remainder != 0)
 			{
 				// Cache sprite pixels value
@@ -256,4 +260,29 @@ void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned 
 		// Go to next frame buffer row
 		Pointer_Frame_Buffer += SYSTEM_DISPLAY_WIDTH - Width; // "Width" bytes have been written yet, subtract them
 	}
+}
+
+void SystemDisplayStartFrameTimer(void)
+{
+	// Configure timer 5 to overflow 50ms later
+	T5CON = 0x30; // Source timer with instruction clock (Fosc/4), select a 1:8 prescaler, disable dedicated secondary oscillator circuit, use two 8-bit operations to access to the timer value
+	T5GCON = 0; // Disable gating mode
+	// Preload timer
+	TMR5H = SYSTEM_DISPLAY_FRAME_COUNTER_PRELOAD_VALUE << 8;
+	TMR5L = (unsigned char) SYSTEM_DISPLAY_FRAME_COUNTER_PRELOAD_VALUE;
+	
+	// Start timer
+	T5CONbits.TMR5ON = 1;
+}
+
+void SystemDisplayWaitForFrameTimerEnd(void)
+{
+	// Wait for the timer overflow
+	while (!PIR5bits.TMR5IF);
+	
+	// Stop timer
+	T5CONbits.TMR5ON = 0;
+	
+	// Reset interrupt flag
+	PIR5bits.TMR5IF = 0;
 }
