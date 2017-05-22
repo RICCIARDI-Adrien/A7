@@ -6,6 +6,7 @@
 #include <System_Display.h>
 #include <System_Interrupt.h>
 #include <System_Keyboard.h>
+#include <System_Random.h>
 #include <System_Serial_Port.h>
 #include <xc.h>
 
@@ -50,6 +51,7 @@ void SystemInitialize(void)
 	SystemKeyboardInitialize();
 	SystemSerialPortInitialize();
 	SystemDisplayInitialize();
+	SystemRandomInitialize();
 	
 	// Initialize and enable interrupts
 	SystemInterruptInitialize();

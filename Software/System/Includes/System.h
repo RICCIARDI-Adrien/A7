@@ -8,6 +8,7 @@
 // Provide all needed includes
 #include <System_Display.h>
 #include <System_Keyboard.h>
+#include <System_Random.h>
 #include <System_Serial_Port.h>
 #include <xc.h> // Provide microcontroller definitions
 
