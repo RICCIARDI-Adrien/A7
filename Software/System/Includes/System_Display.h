@@ -13,6 +13,11 @@
 /** Display height in pixels. */
 #define SYSTEM_DISPLAY_HEIGHT 64
 
+/** Text character width in pixels. */
+#define SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH 6
+/** Text character height in pixels. */
+#define SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT 8
+
 //-------------------------------------------------------------------------------------------------
 // Functions
 //-------------------------------------------------------------------------------------------------
@@ -23,9 +28,9 @@ void SystemDisplayInitialize(void);
 void SystemDisplayClear(void);
 
 /** Clear the internal frame buffer. This is the first rendering function that should be called in the rendering loop. */
-void SystemDisplayBeginRendering(void);
+void SystemDisplayBeginRendering(void); // TODO SystemDisplayClearFrameBuffer
 /** Send the frame buffer content to the display. This is the last rendering function called in the rendering loop. */
-void SystemDisplayEndRendering(void);
+void SystemDisplayEndRendering(void); // SystemDisplayDrawFrameBuffer or Show or Render
 
 /** Render a sprite in the frame buffer at the specified location.
  * @param X Sprite leftmost coordinate (must be in the display area).
@@ -42,5 +47,23 @@ void SystemDisplayStartFrameTimer(void);
  * @note This function immediately returns if the frame lasted too long (i.e. system can't keep up).
  */
 void SystemDisplayWaitForFrameTimerEnd(void);
+
+// TODO allow to display text everywhere on the display (not only in fixed slots) ?
+/** Set the coordinates of the cursor used to render text in the frame buffer.
+ * @param X Horizontal cursor coordinate. Must be in range [0; 20] (maximum value is equal to the following integer division : SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH).
+ * @param Y Vertical cursor coordinate. Must be in range [0; 7] (maximum value is equal to the following integer division : SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT).
+ * @note The cursor location is not updated if the provided coordinates are out of the display bounds.
+ */
+void SystemDisplaySetTextCursor(unsigned char X, unsigned char Y);
+/** Render an ASCII character at the current text cursor location and increment the cursor horizontal coordinate.
+ * @param Character The character to display's ASCII code.
+ * @note The character is not rendered if the cursor coordinates are out of cursor bounds.
+ */
+void SystemDisplayRenderTextCharacter(unsigned char Character);
+/** Render an ASCII string at the current text cursor location and increment the cursor horizontal coordinate.
+ * @param String The string to render.
+ * @note Characters are not rendered if the cursor coordinates are out of cursor bounds.
+ */
+void SystemDisplayRenderTextString(const unsigned char *String);
 
 #endif
