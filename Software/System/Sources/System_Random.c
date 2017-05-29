@@ -15,12 +15,9 @@ static unsigned char System_Random_Seed;
 // Public functions
 //--------------------------------------------------------------------------------------------------
 void SystemRandomInitialize(void)
-{
-	// Use the unknown value stored in the CCPR5 registers to initialize the random number generator (it is possible because CCP5 module is not used, so it's content is not altered)
-	System_Random_Seed = CCPR5L;
-
-	// Initialize the timer 4 to count at its maximum frequency
-	T4CON = 0x04; // Enable the timer with a 1:1 prescaler and 1:1 postscaler
+{	
+	// Seed the random numbers generator with a random value (timer 4 started counting before the main oscillator was stable, so it's value is hard to predict)
+	System_Random_Seed = TMR4;
 }
 
 unsigned char SystemRandomGetNumber(void)
