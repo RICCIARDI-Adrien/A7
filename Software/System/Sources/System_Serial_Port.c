@@ -24,6 +24,15 @@ void SystemSerialPortInitialize(void)
 	TRISBbits.RB6 = 1;
 }
 
+unsigned char SystemSerialPortReadByte(void)
+{
+	// Wait for a byte to be received
+	while (!PIR3bits.RC2IF);
+	
+	// Get the byte
+	return RCREG2;
+}
+
 void SystemSerialPortWriteByte(unsigned char Data)
 {
 	// Wait for the bus to be idle
