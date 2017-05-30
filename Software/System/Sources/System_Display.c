@@ -6,23 +6,22 @@
 #include <System.h> // To have _XTAL_FREQ definition for delay() functions
 #include <System_Display.h>
 #include <xc.h>
- 
+
 //-------------------------------------------------------------------------------------------------
 // Private constants
 //-------------------------------------------------------------------------------------------------
-// WARNING the following pinout is the Mikroe EasyPic v7 one, not the final circuit one
-/** RST pin. */
-#define SYSTEM_DISPLAY_PIN_RESET LATBbits.LATB5
-/** R/W pin. */
-#define SYSTEM_DISPLAY_PIN_READ_WRITE LATBbits.LATB3
-/** D/I (also known as R/S) pin. */
-#define SYSTEM_DISPLAY_PIN_DATA_INSTRUCTION LATBbits.LATB2
-/** E pin. */
-#define SYSTEM_DISPLAY_PIN_ENABLE LATBbits.LATB4
-/** CS2 pin. */
-#define SYSTEM_DISPLAY_PIN_CHIP_SELECT_2 LATBbits.LATB1
 /** CS1 pin. */
 #define SYSTEM_DISPLAY_PIN_CHIP_SELECT_1 LATBbits.LATB0
+/** CS2 pin. */
+#define SYSTEM_DISPLAY_PIN_CHIP_SELECT_2 LATBbits.LATB1
+/** D/I (also known as R/S) pin. */
+#define SYSTEM_DISPLAY_PIN_DATA_INSTRUCTION LATBbits.LATB2
+/** R/W pin. */
+#define SYSTEM_DISPLAY_PIN_READ_WRITE LATBbits.LATB3
+/** E pin. */
+#define SYSTEM_DISPLAY_PIN_ENABLE LATBbits.LATB4
+/** RST pin. */
+#define SYSTEM_DISPLAY_PIN_RESET LATBbits.LATB5
 
 /** The busy flag bit in the status register. */
 #define SYSTEM_DISPLAY_STATUS_REGISTER_BUSY_FLAG_BIT_MASK 0x80

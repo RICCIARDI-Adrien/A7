@@ -17647,12 +17647,12 @@ general purpose rectifier, 1 A</description>
 <text x="142.24" y="-2.54" size="1.778" layer="91">Vss</text>
 <text x="142.24" y="-5.08" size="1.778" layer="91">K</text>
 <text x="142.24" y="-7.62" size="1.778" layer="91">A</text>
-<text x="142.24" y="40.64" size="1.778" layer="91">/CS1</text>
-<text x="142.24" y="38.1" size="1.778" layer="91">/CS2</text>
-<text x="142.24" y="35.56" size="1.778" layer="91">E</text>
+<text x="142.24" y="27.94" size="1.778" layer="91">/CS1</text>
+<text x="142.24" y="30.48" size="1.778" layer="91">/CS2</text>
+<text x="142.24" y="38.1" size="1.778" layer="91">E</text>
 <text x="142.24" y="33.02" size="1.778" layer="91">D/I</text>
-<text x="142.24" y="30.48" size="1.778" layer="91">R/W</text>
-<text x="142.24" y="27.94" size="1.778" layer="91">RST</text>
+<text x="142.24" y="35.56" size="1.778" layer="91">R/W</text>
+<text x="142.24" y="40.64" size="1.778" layer="91">RST</text>
 <text x="-73.66" y="114.3" size="1.778" layer="91">+9V</text>
 <text x="5.08" y="38.1" size="1.778" layer="91">Routing optimization</text>
 </plain>
