@@ -294,8 +294,8 @@ void SystemKeyboardInitialize(void)
 	ANSELCbits.ANSC7 = 0;
 	ANSELCbits.ANSC6 = 0;
 	// Disable pin output driver (set them as input)
-	TRISCbits.RC7 = 1;
-	TRISCbits.RC6 = 1;	
+	TRISCbits.TRISC7 = 1;
+	TRISCbits.TRISC6 = 1;	
 	
 	// Enable interrupts 
 	PIE1bits.RC1IE = 1; // UART reception interrupt

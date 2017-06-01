@@ -20,8 +20,8 @@ void SystemSerialPortInitialize(void)
 	BAUDCON2 = 0x08; // Use default signal polarities, enable 16-bit baud rate generator, disable auto-baud detection
 	
 	// Configure UART pins (no need to disable analog feature as RB7 and RB6 have not analog input)
-	TRISBbits.RB7 = 1; // Disable pin output driver (set them as input)
-	TRISBbits.RB6 = 1;
+	TRISBbits.TRISB7 = 1; // Disable pin output driver (set them as input)
+	TRISBbits.TRISB6 = 1;
 }
 
 unsigned char SystemSerialPortReadByte(void)
