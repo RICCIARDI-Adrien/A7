@@ -54,7 +54,8 @@ void SystemInitialize(void)
 	SystemKeyboardInitialize();
 	SystemSerialPortInitialize();
 	SystemDisplayInitialize();
-	SystemRandomInitialize();
+	SystemExternalEEPROMInitialize();
+	SystemRandomInitialize(); // Initialize random module at the end to loose as much as possible random time initializing other devices, so the random seed will be better
 	
 	// Initialize and enable interrupts
 	SystemInterruptInitialize();
