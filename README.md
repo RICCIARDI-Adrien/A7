@@ -8,7 +8,7 @@ A hand-made computer based on a 8-bit PIC18F26K22 microcontroller.
 * 3896 RAM bytes.
 * 32768 16-bit instruction words.
 
-### Display
+### Display
 * 128x64 STN display with white pixels on blue backlight.
 * 8-bit data interface with the microcontroller.
 

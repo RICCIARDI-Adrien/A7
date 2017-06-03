@@ -74,11 +74,36 @@ void SystemExternalEEPROMInitialize(void)
 	
 	// Configure MSSP1 for SPI master operation
 	SSP1STAT = 0; // Sample input data at middle of data output time, transmit on transition from idle to active clock state
-	SSP1CON1 = 0x21; // Enable SPI module, set idle state as low level, select SPI master mode with Fosc/16 = 4MHz clock (this is the fastest clock that seems to be working and stable)
+	SSP1CON1 = 0x31; // Enable SPI module, use clock mode 1 to generate a rising edge when data is valid because EEPROM samples input data on clock rising edge, select SPI master mode with Fosc/16 = 4MHz clock (this is the fastest clock that seems to be working and stable)
+	
+	// Wake-up chip by doing a high-to-low transition on /CS pin (do twice to be sure it works)
+	SYSTEM_EXTERNAL_EEPROM_UNSELECT_DEVICE();
+	SYSTEM_EXTERNAL_EEPROM_SELECT_DEVICE();
+	SYSTEM_EXTERNAL_EEPROM_UNSELECT_DEVICE();
+	SYSTEM_EXTERNAL_EEPROM_SELECT_DEVICE();
 }
 
 void SystemExternalEEPROMReadPage(unsigned short Page_Number, unsigned char *Pointer_Buffer)
 {
+	unsigned short i;
+	
+	// Make sure address is in range
+	if (Page_Number >= SYSTEM_EXTERNAL_EEPROM_PAGES_COUNT) return;
+	
+	SYSTEM_EXTERNAL_EEPROM_SELECT_DEVICE();
+	// Send read command
+	SystemExternalEEPROMTransferSPIByte(SYSTEM_EXTERNAL_EEPROM_COMMAND_READ_DATA);
+	// Send 24-bit address
+	SystemExternalEEPROMTransferSPIByte(Page_Number >> 8);
+	SystemExternalEEPROMTransferSPIByte((unsigned char) Page_Number);
+	SystemExternalEEPROMTransferSPIByte(0); // See SystemExternalEEPROMWritePage() for more details on address computation
+	// Read a whole page
+	for (i = 0; i < SYSTEM_EXTERNAL_EEPROM_PAGE_SIZE; i++)
+	{
+		*Pointer_Buffer = SystemExternalEEPROMTransferSPIByte(0);
+		Pointer_Buffer++;
+	}
+	SYSTEM_EXTERNAL_EEPROM_UNSELECT_DEVICE();
 }
 
 void SystemExternalEEPROMWritePage(unsigned short Page_Number, unsigned char *Pointer_Buffer)
