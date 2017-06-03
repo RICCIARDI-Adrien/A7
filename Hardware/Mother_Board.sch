@@ -18030,20 +18030,20 @@ general purpose rectifier, 1 A</description>
 <segment>
 <pinref part="U2" gate="A" pin="SI"/>
 <wire x1="-38.1" y1="2.54" x2="-15.24" y2="2.54" width="0.1524" layer="91"/>
-<wire x1="-15.24" y1="2.54" x2="-15.24" y2="27.94" width="0.1524" layer="91"/>
-<pinref part="U1" gate="A" pin="RC4"/>
-<wire x1="-15.24" y1="27.94" x2="38.1" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="2.54" x2="-15.24" y2="25.4" width="0.1524" layer="91"/>
+<pinref part="U1" gate="A" pin="RC5"/>
+<wire x1="38.1" y1="25.4" x2="-15.24" y2="25.4" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$23" class="0">
 <segment>
-<pinref part="U1" gate="A" pin="RC5"/>
-<wire x1="38.1" y1="25.4" x2="-10.16" y2="25.4" width="0.1524" layer="91"/>
-<wire x1="-10.16" y1="25.4" x2="-10.16" y2="-22.86" width="0.1524" layer="91"/>
+<wire x1="-10.16" y1="27.94" x2="-10.16" y2="-22.86" width="0.1524" layer="91"/>
 <wire x1="-10.16" y1="-22.86" x2="-76.2" y2="-22.86" width="0.1524" layer="91"/>
 <wire x1="-76.2" y1="-22.86" x2="-76.2" y2="-10.16" width="0.1524" layer="91"/>
 <pinref part="U2" gate="A" pin="SO"/>
 <wire x1="-76.2" y1="-10.16" x2="-73.66" y2="-10.16" width="0.1524" layer="91"/>
+<pinref part="U1" gate="A" pin="RC4"/>
+<wire x1="-10.16" y1="27.94" x2="38.1" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$24" class="0">
