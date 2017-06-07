@@ -30,7 +30,7 @@ A hand-made computer based on a 8-bit PIC18F26K22 microcontroller.
 * Polarity reversal protection.
 
 # Hardware
-Schematics and PCB are made with Eagle 7.5.  
+Schematics and PCB have been made with Eagle 7.5.  
 
 ![Mother board schematics](https://github.com/RICCIARDI-Adrien/A7/blob/master/Hardware/Mother_Board_Schematics.png)
 
@@ -38,3 +38,6 @@ Schematics and PCB are made with Eagle 7.5.
 
 # Software
 Use Microchip XC8 compiler to build software.
+
+# Casing
+Casing panels have been drawn with LibreCAD.
