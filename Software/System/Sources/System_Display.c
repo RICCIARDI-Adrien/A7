@@ -285,7 +285,7 @@ void SystemDisplayClear(void)
 	}
 }
 
-void SystemDisplayBeginRendering(void)
+void SystemDisplayClearFrameBuffer(void)
 {
 	unsigned short i;
 	
@@ -293,7 +293,7 @@ void SystemDisplayBeginRendering(void)
 	for (i = 0; i < sizeof(System_Display_Frame_Buffer); i++) System_Display_Frame_Buffer[i] = 0;
 }
 
-void SystemDisplayEndRendering(void)
+void SystemDisplayRenderFrameBuffer(void)
 {
 	unsigned char Controller_ID, Row, Column;
 	unsigned short i = 0;

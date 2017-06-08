@@ -4,102 +4,78 @@
  */
 #include <System.h>
 
-void bla(void);
-extern unsigned char System_Display_Frame_Buffer[512];
+void hex(unsigned char val, unsigned char *msb, unsigned char *lsb)
+{
+	unsigned char i;
+	
+	i = val >> 4;
+	if (i < 10) *msb = i + '0';
+	else *msb = i + 'A' - 10;
+	
+	i = val & 0x0F;
+	if (i < 10) *lsb = i + '0';
+	else *lsb = i + 'A' - 10;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Entry point
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	unsigned char i, Inverted_Value, Value, tmp;
-	signed short x = 0, y = 0, Vertical_Speed = 8, Horizontal_Speed = 1;
-	
+	unsigned char c, buf1[256], buf2[256], msb, lsb;
+	unsigned short i;
 	
 	SystemInitialize();
 	
+	// TEST
 	SystemSerialPortWriteString("aaa init string\r\n"); // Sending "aaa" first allows to use UART on RB6 and RB7 pins without being too bored by mikroProg on a Easy PIC 7 MikroElektronika board (value found by chance)
 	SystemSerialPortWriteString("This is a test string\r\n");
 	
-	//LATB = 0;
-	//TRISB = 0;
+	SystemDisplayClearFrameBuffer();
+	
+	SystemDisplaySetTextCursor(0, 0);
+	SystemDisplayRenderTextString("ABCDEFGHIJKLM");
+	SystemDisplaySetTextCursor(0, 1);
+	SystemDisplayRenderTextString("NOPQRSTUVWXYZ");
+	SystemDisplaySetTextCursor(0, 2);
+	SystemDisplayRenderTextString("0123456789");
+	
+	SystemDisplayRenderFrameBuffer();
+	
+#if 0
 	while (1)
 	{
-		#if 0
-		// Wait for a character to be received
-		while (!PIR1bits.RC1IF);
-		RCSTA1bits.CREN = 0;
+		c = SystemSerialPortReadByte();
 		
-		tmp = RCSTA1 & 0x01;
+		if ((c >= 'A') && (c <= 'Z')) c += 32;
 		
-		Inverted_Value = RCREG1;
-		/*Value = 0;
-		for (i = 0; i < 7; i++)
-		{
-			Value |= Inverted_Value & 1;
-			Inverted_Value >>= 1;
-			Value <<= 1;
-		}
-		LATB = Value;*/
-		//LATB = Inverted_Value;
-		
-		Inverted_Value >>= 1;
-		if (tmp) Inverted_Value |= 0x80;
-		SystemSerialPortWriteByte(Inverted_Value);
-		SystemSerialPortWriteByte(tmp);
-		SystemSerialPortWriteByte('\r');
-		SystemSerialPortWriteByte('\n');
-		
-		RCSTA1bits.CREN = 1;
-		
-		#endif
-		
-		#if 0
-		SystemSerialPortWriteByte(SystemKeyboardReadCharacter());
-		#endif
-		
-		SystemDisplayBeginRendering();
-		
-		/*System_Display_Frame_Buffer[0] = 0xAA;
-		System_Display_Frame_Buffer[127] = 0x55;
-		System_Display_Frame_Buffer[128] = 0xCC;*/
-		
-		System_Display_Frame_Buffer[y * 128 + x] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 1] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 2] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 3] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 4] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 5] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 6] = 0xFF;
-		System_Display_Frame_Buffer[y * 128 + x + 7] = 0xFF;
-		
-		SystemDisplayEndRendering();
-		__delay_ms(66);
-	//__delay_ms(1000);
-		
-		x += Vertical_Speed;
-		y += Horizontal_Speed;
-		
-		if (x >= 120)
-		{
-			x = 119;
-			Vertical_Speed = -8;
-		}
-		else if (x < 0)
-		{
-			x = 0;
-			Vertical_Speed = 8;
-		}
-		
-		if (y >= 8)
-		{
-			y = 7;
-			Horizontal_Speed = -1;
-		}
-		else if (y < 0)
-		{
-			y = 0;
-			Horizontal_Speed = 1;
-		}
+		SystemSerialPortWriteByte(c);
 	}
+#endif
+
+#if 0
+	for (i = 0; i < 256; i++)
+	{
+		buf1[i] = 255 - (unsigned char) i;
+		buf2[i] = 0;
+	}
+
+	SystemExternalEEPROMWritePage(0, buf1);
+	
+	SystemExternalEEPROMReadPage(0, buf2);
+	
+	for (i = 0; i < 256; i++)
+	{
+		hex(i, &msb, &lsb);
+		SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+		SystemSerialPortWriteString(" : ");
+		
+		hex(buf2[i], &msb, &lsb);
+		SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+		SystemSerialPortWriteString("\r\n");
+	}
+#endif
+	
+	// TEST
+	while (1);
 }

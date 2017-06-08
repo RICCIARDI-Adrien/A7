@@ -64,7 +64,7 @@ void main(void)
 	while (1)
 	{
 		SystemDisplayStartFrameTimer();
-		SystemDisplayBeginRendering();
+		SystemDisplayClearFrameBuffer();
 		
 		// Handle ball moves
 		for (i = 0; i < BALLS_COUNT; i++)
@@ -104,7 +104,7 @@ void main(void)
 			Pointer_Ball->Y += Pointer_Ball->Horizontal_Speed;
 		}
 		
-		SystemDisplayEndRendering();
+		SystemDisplayRenderFrameBuffer();
 		SystemDisplayWaitForFrameTimerEnd();
 	}
 }

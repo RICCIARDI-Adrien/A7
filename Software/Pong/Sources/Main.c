@@ -32,11 +32,11 @@ void main(void)
 	
 	while (1)
 	{
-		SystemDisplayBeginRendering();
+		SystemDisplayClearFrameBuffer();
 		
 		SystemDisplayRenderSprite(Ball_X, Ball_Y, Sprite_Ball, SPRITE_BALL_WIDTH, SPRITE_BALL_HEIGHT);
 		
-		SystemDisplayEndRendering();
+		SystemDisplayRenderFrameBuffer();
 		__delay_ms(66);
 		//__delay_ms(16);
 				
