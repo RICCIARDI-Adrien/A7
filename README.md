@@ -41,3 +41,5 @@ Use Microchip XC8 compiler to build software.
 
 # Casing
 Casing panels have been drawn with LibreCAD.
+
+![Casing panels](https://github.com/RICCIARDI-Adrien/A7/blob/master/Resources/Casing/All_Panels.png)
