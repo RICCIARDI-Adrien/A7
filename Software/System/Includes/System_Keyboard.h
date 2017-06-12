@@ -59,4 +59,11 @@ void SystemKeyboardTimerInterruptHandler(void);
  */
 unsigned char SystemKeyboardReadCharacter(void);
 
+/** Wait for a key to be typed without needing interrupts to be enabled to work (this function discards all previous typed keys).
+ * @warning This function is specially designed for use by the program manager application only (program manager application can't use interrupts because the interrupt entry points in the flash memory are dedicated to the other applications it runs).
+ * @warning This function can't be used with keyboard UART or timer interrupts enabled.
+ * @return The ASCII code of the last typed key.
+ */
+unsigned char SystemKeyboardReadCharacterNoInterrupt(void);
+
 #endif

@@ -2,6 +2,7 @@
  * See System_Keyboard.h for description.
  * @author Adrien RICCIARDI
  */
+#include <System.h> // Needed for the clock frequency constant
 #include <System_Keyboard.h>
 #include <xc.h>
 
@@ -405,6 +406,31 @@ unsigned char SystemKeyboardReadCharacter(void)
 {
 	// Wait for a key to be received
 	while (!System_Keyboard_Is_Key_Available);
+	System_Keyboard_Is_Key_Available = 0;
+	
+	return System_Keyboard_Received_Character;
+}
+
+unsigned char SystemKeyboardReadCharacterNoInterrupt(void)
+{
+	// Flush the UART before waiting for a key to discard any previously received character
+	asm("movf RCREG1, W\n"); // Force a read of the UART register to reset the interrupt flag
+	
+	// Get bytes from the keyboard until a full character has been received
+	do
+	{
+		// Wait for a byte to be received by the UART
+		while (!PIR1bits.RC1IF);
+		
+		// Handle the received byte
+		SystemKeyboardUARTInterruptHandler();
+		
+		// Re-enable UART reception when the whole data frame has been sent by the keyboard (in order to discard the latest frame bits)
+		__delay_us(256);
+		RCSTA1bits.CREN = 1;
+	} while (!System_Keyboard_Is_Key_Available);
+	
+	// Tell that the character has been retrieved
 	System_Keyboard_Is_Key_Available = 0;
 	
 	return System_Keyboard_Received_Character;
