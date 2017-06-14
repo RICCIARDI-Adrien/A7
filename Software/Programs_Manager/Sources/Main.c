@@ -2,6 +2,8 @@
  * Manage applications stored on the external EEPROM memory.
  * @author Adrien RICCIARDI
  */
+#include <File_System.h>
+#include <Menu.h>
 #include <System.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -23,19 +25,15 @@ void main(void)
 {
 	unsigned char c;
 	
-	SystemInitialize(); // TODO sans interrupts ?
-		INTCON = 0;
+	// Initialize needed peripherals
+	SystemInitialize(); // This function automatically enables interrupts
+	INTCON = 0; // Immediately disable interrupts as they can't be used in this program because it is relocated at the end of the program memory (so the interrupt vectors are not available)
 	
-	SystemDisplayClearFrameBuffer();
+	// Load files information from the internal EEPROM
+	FileSystemLoad();
 	
-	SystemDisplaySetTextCursor(0, 0);
-	SystemDisplayRenderTextString("ABCDEFGHIJKLM");
-	SystemDisplaySetTextCursor(0, 1);
-	SystemDisplayRenderTextString("NOPQRSTUVWXYZ");
-	SystemDisplaySetTextCursor(0, 2);
-	SystemDisplayRenderTextString("0123456789");
-	
-	SystemDisplayRenderFrameBuffer();
+	// TEST
+	MenuShowFiles("TEST TITLE");
 	
 	while (1)
 	{
