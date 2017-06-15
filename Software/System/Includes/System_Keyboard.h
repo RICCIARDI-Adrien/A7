@@ -42,6 +42,9 @@
 /** "Caps lock" key virtual key code. */
 #define SYSTEM_KEYBOARD_KEY_CODE_CAPITALS_LOCK 239
 
+/** "Escape" key code. */
+#define SYSTEM_KEYBOARD_KEY_CODE_ESCAPE 27
+
 //-------------------------------------------------------------------------------------------------
 // Functions
 //-------------------------------------------------------------------------------------------------

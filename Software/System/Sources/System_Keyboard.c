@@ -135,7 +135,7 @@ static unsigned char System_Keyboard_Lowercase_Characters[] =
 	'5', // Offset 0x73
 	'6', // Offset 0x74 (TODO also right arrow)
 	'8', // Offset 0x75 (TODO also up arrow)
-	27, // Offset 0x76
+	SYSTEM_KEYBOARD_KEY_CODE_ESCAPE, // Offset 0x76
 	0, // Offset 0x77
 	SYSTEM_KEYBOARD_KEY_CODE_F11, // Offset 0x78
 	'+', // Offset 0x79
@@ -268,7 +268,7 @@ static unsigned char System_Keyboard_Uppercase_Characters[] =
 	'5', // Offset 0x73
 	'6', // Offset 0x74 (TODO also right arrow)
 	'8', // Offset 0x75 (TODO also up arrow)
-	27, // Offset 0x76
+	SYSTEM_KEYBOARD_KEY_CODE_ESCAPE, // Offset 0x76
 	0, // Offset 0x77
 	SYSTEM_KEYBOARD_KEY_CODE_F11, // Offset 0x78
 	'+', // Offset 0x79
