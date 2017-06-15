@@ -33,6 +33,12 @@ unsigned char SystemSerialPortReadByte(void)
 	return RCREG2;
 }
 
+unsigned char SystemSerialPortIsByteReceived(void)
+{
+	if (PIR3bits.RC2IF) return 1;
+	return 0;
+}
+
 void SystemSerialPortWriteByte(unsigned char Data)
 {
 	// Wait for the bus to be idle

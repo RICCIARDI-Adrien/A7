@@ -16,6 +16,13 @@ void SystemSerialPortInitialize(void);
  */
 unsigned char SystemSerialPortReadByte(void);
 
+/** Tell whether a byte has been received.
+ * @return 0 if no byte was received,
+ * @return 1 if a byte is available.
+ * @note This function is non blocking.
+ */
+unsigned char SystemSerialPortIsByteReceived(void);
+
 /** Send a single byte of data through the serial port.
  * @param Data The byte to send.
  */
