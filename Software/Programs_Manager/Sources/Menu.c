@@ -17,7 +17,7 @@ void MenuShowFiles(unsigned char *String_Menu_Title)
 	SystemDisplaySetTextCursor(0, 0);
 	
 	// Display title
-	SystemDisplayRenderTextString(String_Menu_Title);
+	SystemDisplayRenderTextString((const unsigned char *) String_Menu_Title);
 	
 	// Display available programs
 	for (i = 0; i < FILE_SYSTEM_MAXIMUM_FILES_COUNT; i++)
@@ -29,8 +29,8 @@ void MenuShowFiles(unsigned char *String_Menu_Title)
 		SystemDisplayRenderTextCharacter('.');
 		SystemDisplayRenderTextCharacter(' ');
 		
-		// Display the file name
-		SystemDisplayRenderTextString(File_System_Files_Information[i].String_Name);
+		// Display the file name TODO 18-byte string does not have terminating zero, but is going out display right bound...
+		if (File_System_Files_Information[i].String_Name[0] != 0xFF) SystemDisplayRenderTextString((const unsigned char *) File_System_Files_Information[i].String_Name); // Do not display the file name if the EEPROM contains only erased data
 	}
 	
 	// TODO display exit text
