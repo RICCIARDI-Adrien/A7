@@ -40,15 +40,9 @@ static inline void FileSystemReadFileInformation(unsigned char File_ID, unsigned
 	for (i = 0; i < FILE_SYSTEM_FILE_NAME_SIZE; i++)
 	{
 		*String_Name = SystemInternalEEPROMReadByte(Internal_EEPROM_Address);
-		
-		// Do not continue if the string is terminated
-		if (*String_Name == 0) break;
-		
 		Internal_EEPROM_Address++;
 		String_Name++;
 	}
-	// Add a terminating zero (useful only for maximum-length strings
-	*String_Name = 0;
 	
 	// Read the file size
 	// Least significant byte
@@ -81,10 +75,6 @@ static inline void FileSystemWriteFileInformation(unsigned char File_ID, unsigne
 	for (i = 0; i < FILE_SYSTEM_FILE_NAME_SIZE; i++)
 	{
 		SystemInternalEEPROMWriteByte(Internal_EEPROM_Address, *String_Name);
-		
-		// Do not continue if the string is terminated
-		if (*String_Name == 0) break;
-		
 		Internal_EEPROM_Address++;
 		String_Name++;
 	}
@@ -104,11 +94,12 @@ void FileSystemLoad(void)
 {
 	unsigned char i;
 	
-	// TEST
-	FileSystemWriteFileInformation(0, "FICH 1", 12);
-	FileSystemWriteFileInformation(1, "UN AUTRE NOM", 12);
-	FileSystemWriteFileInformation(2, "01234567890123456789", 12);
-	FileSystemWriteFileInformation(3, "", 12);
-	
 	for (i = 0; i < FILE_SYSTEM_MAXIMUM_FILES_COUNT; i++) FileSystemReadFileInformation(i, (unsigned char *) File_System_Files_Information[i].String_Name, &File_System_Files_Information[i].Size);
+}
+
+void FileSystemStore(void)
+{
+	unsigned char i;
+	
+	for (i = 0; i < FILE_SYSTEM_MAXIMUM_FILES_COUNT; i++) FileSystemWriteFileInformation(i, (unsigned char *) File_System_Files_Information[i].String_Name, File_System_Files_Information[i].Size);
 }

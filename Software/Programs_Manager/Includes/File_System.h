@@ -22,7 +22,7 @@
 /** A file information. */
 typedef __pack struct
 {
-	unsigned char *String_Name[FILE_SYSTEM_FILE_NAME_SIZE]; //<! File name. If the file is FILE_SYSTEM_FILE_NAME_SIZE long then the string terminating zero must be removed. If the first byte is 0xFF (like EEPROM erased value), consider the file as empty.
+	unsigned char String_Name[FILE_SYSTEM_FILE_NAME_SIZE]; //<! File name. If the file is FILE_SYSTEM_FILE_NAME_SIZE long then the string terminating zero must be removed. If the first byte is 0xFF (like EEPROM erased value), consider the file as empty.
 	unsigned short Size; //<! File size in bytes.
 } TFileSystemFileInformation;
 
@@ -37,5 +37,8 @@ extern TFileSystemFileInformation File_System_Files_Information[FILE_SYSTEM_MAXI
 //-------------------------------------------------------------------------------------------------
 /** Load files information from the internal EEPROM and store them in the File_System_Files_Information public variable. */
 void FileSystemLoad(void);
+
+/** Save the current file system information on the internal EEPROM. */
+void FileSystemStore(void);
 
 #endif
