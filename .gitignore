@@ -2,6 +2,7 @@
 *.cmf
 *.cof
 *.d
+*.exe
 *.hex
 *.hxl
 *.lib
