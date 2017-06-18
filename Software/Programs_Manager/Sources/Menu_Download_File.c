@@ -16,7 +16,7 @@
 #define MENU_DOWNLOAD_FILE_PROTOCOL_CODE_ACKNOWLEDGE 'A'
 
 /** How many bytes to send at a time when transfering application data. */
-#define MENU_DOWNLOAD_FILE_PROTOCOL_DATA_CHUNK_SIZE 256
+#define MENU_DOWNLOAD_FILE_PROTOCOL_DATA_CHUNK_SIZE SYSTEM_EXTERNAL_EEPROM_PAGE_SIZE
 
 //-------------------------------------------------------------------------------------------------
 // Public functions

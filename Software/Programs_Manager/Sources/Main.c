@@ -10,15 +10,6 @@
 //-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
-/** This function is located in the microcontroller reset vector, this is the first executed code. */
-static void MainEntryPoint(void) __at(0)
-{
-	// Jump to the program entry point, which is located at the end of program memory to let the beginning available to other programs
-	#asm // Do not use asm("xxx") form because the C preprocessor does not replace constants in quoted strings
-		goto STARTING_ADDRESS
-	#endasm
-}
-
 /** Display the main menu and handle the keyboard actions. */
 static inline void MainMenu(void)
 {
@@ -86,7 +77,4 @@ void main(void)
 	
 	// Display the main menu forever
 	MainMenu();
-	
-	// Call the entry point function to force it to be compiled, but call it from somewhere that can't be reached to avoid executing it one more time
-	MainEntryPoint();
 }
