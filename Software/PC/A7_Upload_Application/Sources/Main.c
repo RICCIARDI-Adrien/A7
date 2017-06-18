@@ -48,7 +48,7 @@ static int MainSendApplication(char *String_Serial_Port_Device, int Application_
 {
 	TSerialPortID Serial_Port_ID;
 	int Return_Value = -1, i = MAIN_A7_FILE_NAME_MAXIMUM_CHARACTERS_COUNT, Bytes_To_Send_Count;
-	unsigned char Read_Byte, Byte = 0, *Pointer_Data_To_Send = Main_Microcontroller_Program_Memory;
+	unsigned char Read_Byte, Byte = 0, *Pointer_Data_To_Send = (unsigned char *) (Main_Microcontroller_Program_Memory + MAIN_APPLICATION_BASE_ADDRESS);
 	
 	// Try to connect to the serial port
 	if (SerialPortOpen(String_Serial_Port_Device, 115200, &Serial_Port_ID) != 0)
