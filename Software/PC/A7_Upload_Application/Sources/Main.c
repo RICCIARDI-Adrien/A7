@@ -14,6 +14,8 @@
 //-------------------------------------------------------------------------------------------------
 /** Allowed application size in bytes. */
 #define MAIN_APPLICATION_MAXIMUM_SIZE 32768
+/** Application base address in program memory (application code is relocated after the Programs Manager). */
+#define MAIN_APPLICATION_BASE_ADDRESS 0x2000
 
 /** Maximum amount of characters in an A7 file name. */
 #define MAIN_A7_FILE_NAME_MAXIMUM_CHARACTERS_COUNT 18
@@ -143,7 +145,7 @@ int main(int argc, char *argv[])
 	
 	// Convert hex file to binary
 	printf("Converting Hex file in A7 format...\n");
-	Application_Size = HexParserConvertHexToBinary(String_Hex_File, MAIN_APPLICATION_MAXIMUM_SIZE, Main_Microcontroller_Program_Memory);
+	Application_Size = HexParserConvertHexToBinary(String_Hex_File, MAIN_APPLICATION_MAXIMUM_SIZE, MAIN_APPLICATION_BASE_ADDRESS, Main_Microcontroller_Program_Memory);
 	if (Application_Size == -1)
 	{
 		printf("Error : failed to convert the provided Hex file (make sure the code does not exceeds the allowed %d bytes of program memory).\n", MAIN_APPLICATION_MAXIMUM_SIZE);

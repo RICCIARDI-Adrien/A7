@@ -1,3 +1,6 @@
 [submodule "Software/PC/A7_Upload_Application/Serial_Port_Library"]
 	path = Software/PC/A7_Upload_Application/Serial_Port_Library
 	url = https://github.com/RICCIARDI-Adrien/Serial_Port_Library
+[submodule "Software/PC/A7_Upload_Application/Hex_Parser"]
+	path = Software/PC/A7_Upload_Application/Hex_Parser
+	url = https://github.com/RICCIARDI-Adrien/Hex_Parser
