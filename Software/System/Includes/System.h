@@ -11,6 +11,7 @@
 #include <System_Flash.h>
 #include <System_Internal_EEPROM.h>
 #include <System_Keyboard.h>
+#include <System_Led.h>
 #include <System_Random.h>
 #include <System_Serial_Port.h>
 #include <xc.h> // Provide microcontroller definitions

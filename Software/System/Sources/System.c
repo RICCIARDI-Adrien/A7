@@ -6,6 +6,7 @@
 #include <System_Display.h>
 #include <System_Interrupt.h>
 #include <System_Keyboard.h>
+#include <System_Led.h>
 #include <System_Random.h>
 #include <System_Serial_Port.h>
 #include <xc.h>
@@ -55,6 +56,7 @@ void SystemInitialize(void)
 	SystemSerialPortInitialize();
 	SystemDisplayInitialize();
 	SystemExternalEEPROMInitialize();
+	SystemLedInitialize();
 	SystemRandomInitialize(); // Initialize random module at the end to loose as much as possible random time initializing other devices, so the random seed will be better
 	
 	// Initialize and enable interrupts
