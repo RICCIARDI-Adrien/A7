@@ -83,7 +83,7 @@ void MenuDownloadFile(void)
 		else Bytes_To_Receive_Count = File_Size;
 		
 		// Receive data
-		for (j = 0; j < Bytes_To_Receive_Count; j++) External_EEPROM_Buffer[i] = SystemSerialPortReadByte();
+		for (j = 0; j < Bytes_To_Receive_Count; j++) External_EEPROM_Buffer[j] = SystemSerialPortReadByte();
 		
 		// Write data to external EEPROM
 		SystemExternalEEPROMWritePage(External_EEPROM_Page_Address, External_EEPROM_Buffer);
