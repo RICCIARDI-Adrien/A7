@@ -8,6 +8,7 @@
 // Provide all needed includes
 #include <System_Display.h>
 #include <System_External_EEPROM.h>
+#include <System_Flash.h>
 #include <System_Internal_EEPROM.h>
 #include <System_Keyboard.h>
 #include <System_Random.h>
