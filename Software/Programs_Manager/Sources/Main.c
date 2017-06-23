@@ -41,7 +41,7 @@ Start:
 			switch (Character)
 			{
 				case '1':
-					SystemSerialPortWriteString("menu 1\r\n");
+					MenuStartProgram();
 					goto Start;
 					
 				case '2':

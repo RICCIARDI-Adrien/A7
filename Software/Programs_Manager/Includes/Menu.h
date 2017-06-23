@@ -13,6 +13,9 @@
  */
 void MenuShowFiles(unsigned char *String_Menu_Title);
 
+/** Load a program from the external EEPROM into the program memory and start it. */
+void MenuStartProgram(void);
+
 /** Download a file from the serial port and store it on the external EEPROM. */
 void MenuDownloadFile(void);
 
