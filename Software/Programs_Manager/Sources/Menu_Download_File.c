@@ -57,18 +57,9 @@ void MenuDownloadFile(void)
 	//SystemDisplayRenderTextString(STRING_MENU_EXIT); // TODO : hard to do due to no interrupts on the keyboard
 	SystemDisplayRenderFrameBuffer();
 	
-	// Try to establish connection
-	do
-	{
-		// Send the 'start downloading' code
-		SystemSerialPortWriteByte(MENU_DOWNLOAD_FILE_PROTOCOL_CODE_START_DOWNLOADING);
-		
-		// Did the server answered ?
-		if (SystemSerialPortIsByteReceived()) Byte = SystemSerialPortReadByte();
-	} while (Byte != MENU_DOWNLOAD_FILE_PROTOCOL_CODE_START_DOWNLOADING);
-	// Send the acknowledge code to the server
-	SystemSerialPortWriteByte(MENU_DOWNLOAD_FILE_PROTOCOL_CODE_ACKNOWLEDGE);
-	// Wait for the server to send the acknowledge code (this way all remaining MENU_DOWNLOAD_FILE_PROTOCOL_CODE_START_DOWNLOADING codes sent by the server are discarded
+	// Initiate the connection
+	SystemSerialPortWriteByte(MENU_DOWNLOAD_FILE_PROTOCOL_CODE_START_DOWNLOADING);
+	// Wait for the server clearance
 	while (SystemSerialPortReadByte() != MENU_DOWNLOAD_FILE_PROTOCOL_CODE_ACKNOWLEDGE);
 	
 	// Display the "downloading" message

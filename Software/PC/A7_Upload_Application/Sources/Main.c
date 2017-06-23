@@ -48,7 +48,7 @@ static int MainSendApplication(char *String_Serial_Port_Device, int Application_
 {
 	TSerialPortID Serial_Port_ID;
 	int Return_Value = -1, i = MAIN_A7_FILE_NAME_MAXIMUM_CHARACTERS_COUNT, Bytes_To_Send_Count;
-	unsigned char Read_Byte, Byte = 0, *Pointer_Data_To_Send = (unsigned char *) (Main_Microcontroller_Program_Memory + MAIN_APPLICATION_BASE_ADDRESS);
+	unsigned char *Pointer_Data_To_Send = (unsigned char *) (Main_Microcontroller_Program_Memory + MAIN_APPLICATION_BASE_ADDRESS);
 	
 	// Try to connect to the serial port
 	if (SerialPortOpen(String_Serial_Port_Device, 115200, &Serial_Port_ID) != 0)
@@ -58,19 +58,11 @@ static int MainSendApplication(char *String_Serial_Port_Device, int Application_
 	}
 	
 	// Try to establish connection
-	printf("Connecting to the A7...\n");
-	do
-	{
-		// Send the 'start downloading' code
-		SerialPortWriteByte(Serial_Port_ID, MAIN_DOWNLOAD_PROTOCOL_CODE_START_DOWNLOADING);
-		
-		// Did the client answered ?
-		if (SerialPortIsByteAvailable(Serial_Port_ID, &Read_Byte)) Byte = Read_Byte;
-	} while (Byte != MAIN_DOWNLOAD_PROTOCOL_CODE_START_DOWNLOADING);
-	// Send the acknowledge code to the server
+	printf("Waiting for the A7 to connect...\n");
+	// Wait for the A7 to initiate the connection
+	while (SerialPortReadByte(Serial_Port_ID) != MAIN_DOWNLOAD_PROTOCOL_CODE_START_DOWNLOADING);
+	// Tell the A7 that the connection is established
 	SerialPortWriteByte(Serial_Port_ID, MAIN_DOWNLOAD_PROTOCOL_CODE_ACKNOWLEDGE);
-	// Wait for the server to send the acknowledge code (this way all remaining MAIN_DOWNLOAD_PROTOCOL_CODE_START_DOWNLOADING codes sent by the server are discarded
-	while (SerialPortReadByte(Serial_Port_ID) != MAIN_DOWNLOAD_PROTOCOL_CODE_ACKNOWLEDGE);
 	printf("Connection established.\n");
 	
 	// Wait a bit because the A7 displays another message, and display access is slow
