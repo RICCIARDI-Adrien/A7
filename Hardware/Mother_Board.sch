@@ -17654,7 +17654,7 @@ general purpose rectifier, 1 A</description>
 <text x="142.24" y="35.56" size="1.778" layer="91">R/W</text>
 <text x="142.24" y="40.64" size="1.778" layer="91">RST</text>
 <text x="-73.66" y="114.3" size="1.778" layer="91">+9V</text>
-<text x="5.08" y="38.1" size="1.778" layer="91">Routing optimization</text>
+<text x="5.08" y="45.72" size="1.778" layer="91">Routing optimization</text>
 </plain>
 <instances>
 <instance part="U1" gate="A" x="58.42" y="45.72"/>
@@ -17700,7 +17700,7 @@ general purpose rectifier, 1 A</description>
 <instance part="P+9" gate="VCC" x="33.02" y="119.38"/>
 <instance part="JP7" gate="G$1" x="-48.26" y="124.46" rot="R90"/>
 <instance part="JP8" gate="G$1" x="-66.04" y="68.58" rot="R180"/>
-<instance part="R5" gate="G$1" x="-40.64" y="68.58"/>
+<instance part="R5" gate="G$1" x="-43.18" y="58.42" rot="R270"/>
 <instance part="GND10" gate="1" x="-55.88" y="60.96"/>
 <instance part="C7" gate="G$1" x="20.32" y="109.22"/>
 </instances>
@@ -18148,20 +18148,6 @@ general purpose rectifier, 1 A</description>
 <wire x1="-48.26" y1="114.3" x2="-40.64" y2="114.3" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$37" class="0">
-<segment>
-<pinref part="U1" gate="A" pin="MCLR*/VPP/RE3"/>
-<wire x1="38.1" y1="68.58" x2="-35.56" y2="68.58" width="0.1524" layer="91"/>
-<pinref part="R5" gate="G$1" pin="2"/>
-</segment>
-</net>
-<net name="N$38" class="0">
-<segment>
-<pinref part="JP8" gate="G$1" pin="2"/>
-<pinref part="R5" gate="G$1" pin="1"/>
-<wire x1="-63.5" y1="68.58" x2="-45.72" y2="68.58" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$19" class="0">
 <segment>
 <pinref part="U1" gate="A" pin="RA7"/>
@@ -18182,13 +18168,32 @@ general purpose rectifier, 1 A</description>
 <wire x1="35.56" y1="40.64" x2="-5.08" y2="40.64" width="0.1524" layer="91"/>
 </segment>
 </net>
+<net name="N$37" class="0">
+<segment>
+<pinref part="U1" gate="A" pin="RC0"/>
+<wire x1="38.1" y1="38.1" x2="-43.18" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="-43.18" y1="38.1" x2="-43.18" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="R5" gate="G$1" pin="2"/>
+</segment>
+</net>
+<net name="N$38" class="0">
+<segment>
+<pinref part="JP8" gate="G$1" pin="2"/>
+<pinref part="R5" gate="G$1" pin="1"/>
+<wire x1="-63.5" y1="68.58" x2="-43.18" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-43.18" y1="68.58" x2="-43.18" y2="63.5" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
 <errors>
 <approved hash="104,1,38.1,73.66,U1,VDD,VCC,,,"/>
+<approved hash="202,1,38.1,68.58,U1,MCLR*/VPP/RE3,,,,"/>
 <approved hash="104,1,38.1,12.7,U1,VSS_2,GND,,,"/>
 <approved hash="104,1,38.1,10.16,U1,VSS,GND,,,"/>
+<approved hash="202,1,121.92,71.12,IC1,T2IN,,,,"/>
+<approved hash="202,1,152.4,66.04,IC1,R2IN,,,,"/>
 </errors>
 </schematic>
 </drawing>
