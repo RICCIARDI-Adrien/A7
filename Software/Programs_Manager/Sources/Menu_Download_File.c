@@ -47,9 +47,11 @@ void MenuDownloadFile(void)
 		else if (File_ID == SYSTEM_KEYBOARD_KEY_CODE_ESCAPE) return;
 	}
 	
-	SystemDisplayClearFrameBuffer();
+	// Cache file system information access
+	Pointer_File_Information = &File_System_Files_Information[File_ID];
 	
 	// Display the "connecting" message
+	SystemDisplayClearFrameBuffer();
 	SystemDisplaySetTextCursor(0, 0);
 	SystemDisplayRenderTextString(STRING_MENU_DOWNLOAD_FILE_CONNECTING);
 	// Display the "exit" message on the display bottom
@@ -75,6 +77,9 @@ void MenuDownloadFile(void)
 	// Adjust file size if it crosses file slot bound
 	if (File_Size > FILE_SYSTEM_MAXIMUM_FILE_SIZE) File_Size = FILE_SYSTEM_MAXIMUM_FILE_SIZE;
 	
+	// Keep file size value before the File_Size variable is modified by the following loop (it is safe to update the file system in RAM because the only thing that can stop the downloading protocol is an electrical reboot, so the RAM content will be lost and the non-updated ROM content will keep the good previous value)
+	Pointer_File_Information->Size = File_Size;
+	
 	// Receive the file data chunk by chunk
 	while (File_Size > 0)
 	{
@@ -96,9 +101,7 @@ void MenuDownloadFile(void)
 		SystemSerialPortWriteByte(MENU_DOWNLOAD_FILE_PROTOCOL_CODE_ACKNOWLEDGE);
 	}
 	
-	// Update file system only at the end to be sure that all data were successfully downloaded
-	Pointer_File_Information = &File_System_Files_Information[File_ID];
+	// Write file system only at the downloading end to make sure all the data has been successfully tranfered (this way, a download aborted by an electrical reboot does not modify the file system)
 	for (i = 0; i < FILE_SYSTEM_FILE_NAME_SIZE; i++) Pointer_File_Information->String_Name[i] = String_File_Name[i];
-	Pointer_File_Information->Size = File_Size;
 	FileSystemStore();
 }
