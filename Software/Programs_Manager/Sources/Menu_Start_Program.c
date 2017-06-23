@@ -40,6 +40,8 @@ void MenuStartProgram(void)
 		else if (File_ID == SYSTEM_KEYBOARD_KEY_CODE_ESCAPE) return;
 	}
 	
+	SystemLedOn();
+	
 	// Display the "loading" message
 	SystemDisplayClearFrameBuffer();
 	SystemDisplaySetTextCursor(0, 0);
@@ -64,6 +66,8 @@ void MenuStartProgram(void)
 		
 		External_EEPROM_Page_Address++;
 	}
+	
+	SystemLedOff();
 	
 	// Jump to the application entry point
 	#asm

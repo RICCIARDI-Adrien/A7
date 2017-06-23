@@ -64,6 +64,8 @@ void MenuDownloadFile(void)
 	// Wait for the server clearance
 	while (SystemSerialPortReadByte() != MENU_DOWNLOAD_FILE_PROTOCOL_CODE_ACKNOWLEDGE);
 	
+	SystemLedOn();
+	
 	// Display the "downloading" message
 	SystemDisplaySetTextCursor(0, 1);
 	SystemDisplayRenderTextString(STRING_MENU_DOWNLOAD_FILE_DOWNLOADING);
@@ -104,4 +106,6 @@ void MenuDownloadFile(void)
 	// Write file system only at the downloading end to make sure all the data has been successfully tranfered (this way, a download aborted by an electrical reboot does not modify the file system)
 	for (i = 0; i < FILE_SYSTEM_FILE_NAME_SIZE; i++) Pointer_File_Information->String_Name[i] = String_File_Name[i];
 	FileSystemStore();
+	
+	SystemLedOff();
 }
