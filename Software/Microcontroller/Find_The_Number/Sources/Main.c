@@ -22,8 +22,8 @@ void hex(unsigned char val, unsigned char *msb, unsigned char *lsb)
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	unsigned char c, buf1[256], buf2[256], msb, lsb;
-	unsigned short i;
+	unsigned char c, buf1[256], buf2[256], msb, lsb, msg[] = "Message qui doit faire environ 64 carateres pour reussir le test";
+	unsigned short i, j;
 	
 	SystemInitialize();
 	
@@ -75,6 +75,83 @@ void main(void)
 		SystemSerialPortWriteString("\r\n");
 	}
 #endif
+
+#if 0
+	for (i = 0; i < 256; i++)
+	{
+		buf1[i] = 255 - (unsigned char) i;
+		buf2[i] = (unsigned char) i;
+	}
+
+	SystemExternalEEPROMWritePage(0, buf1);
+	SystemExternalEEPROMWritePage(1, buf2);
+	
+	SystemExternalEEPROMReadPage(0, buf2);
+	for (i = 0; i < 256; i++)
+	{
+		hex(i, &msb, &lsb);
+		SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+		SystemSerialPortWriteString(" : ");
+		
+		hex(buf2[i], &msb, &lsb);
+		SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+		SystemSerialPortWriteString("\r\n");
+	}
+	SystemSerialPortWriteString("\r\n");
+	
+	SystemExternalEEPROMReadPage(1, buf2);
+	for (i = 0; i < 256; i++)
+	{
+		hex(i, &msb, &lsb);
+		SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+		SystemSerialPortWriteString(" : ");
+		
+		hex(buf2[i], &msb, &lsb);
+		SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+		SystemSerialPortWriteString("\r\n");
+	}
+#endif
+
+#if 0
+	for (j = 0; j < 32768/256; j++) 
+	{
+		SystemExternalEEPROMReadPage(j, buf2);
+		
+		for (i = 0; i < 256; i++)
+		{
+			hex(i, &msb, &lsb);
+			SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+			SystemSerialPortWriteString(" : ");
+			
+			hex(buf2[i], &msb, &lsb);
+			SystemSerialPortWriteByte(msb); SystemSerialPortWriteByte(lsb);
+			SystemSerialPortWriteString("\r\n");
+		}
+		SystemSerialPortWriteString("-------------------------\r\n");
+	}
+	
+#endif
+
+#if 0
+	SystemFlashWriteBlock(0x2000/64, msg);
+#endif
+
+	i = 0;
+	while (1)
+	{
+		if (i == 0)
+		{
+			SystemLedOn();
+			i = 1;
+		}
+		else
+		{
+			SystemLedOff();
+			i = 0;
+		}
+		
+		__delay_ms(458);
+	}
 	
 	// TEST
 	while (1);
