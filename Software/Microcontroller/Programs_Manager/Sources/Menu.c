@@ -4,6 +4,7 @@
  */
 #include <File_System.h>
 #include <Menu.h>
+#include <String.h>
 #include <System.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -33,7 +34,9 @@ void MenuShowFiles(unsigned char *String_Menu_Title)
 		if (File_System_Files_Information[i].String_Name[0] != 0xFF) SystemDisplayRenderTextString((const unsigned char *) File_System_Files_Information[i].String_Name); // Do not display the file name if the EEPROM contains only erased data
 	}
 	
-	// TODO display exit text
+	// Display the exit command at the display bottom
+	SystemDisplaySetTextCursor(0, 7);
+	SystemDisplayRenderTextString(STRING_MENU_EXIT);
 		
 	SystemDisplayRenderFrameBuffer();
 }

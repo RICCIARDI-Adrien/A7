@@ -9,7 +9,7 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Common strings
-#define STRING_MENU_EXIT "Echap : retour"
+#define STRING_MENU_EXIT "ECHAP : RETOUR"
 
 // Main menu strings
 #define STRING_MENU_MAIN_TITLE " A7 Operating System"
