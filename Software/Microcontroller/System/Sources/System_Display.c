@@ -45,7 +45,7 @@ static unsigned char System_Display_Text_Cursor_Y = 0;
 static const unsigned char System_Display_Font_Sprites[][SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH] =
 {
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 0
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 1
+	{ 0x7F, 0x41, 0x41, 0x41, 0x7F, 0x00 }, // ASCII code 1 (use its sprite to represent an unknown character)
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 2
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 3
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 4
@@ -433,6 +433,9 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 {
 	// Do nothing if the character go out the display area (clipping optimization)
 	if ((System_Display_Text_Cursor_X >= SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH) || (System_Display_Text_Cursor_Y >= SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT)) return;
+	
+	// Only ASCII codes from 0 to 127 have corresponding sprite, if the provided character has no sprite display a rectangle telling that the character is unknown
+	if (Character > 127) Character = 1; // ASCII code 1 is never used, so recycle its sprite for the unknown character case
 
 	// Render the character sprite to the frame buffer
 	SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[Character], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
