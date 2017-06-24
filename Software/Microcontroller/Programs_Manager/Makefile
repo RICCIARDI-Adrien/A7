@@ -11,7 +11,7 @@ APPLICATION_BASE_ADDRESS = 0x2000
 # -P option allows assembly files to be parsed by the C preprocessor
 CCFLAGS = --chip=18F26K22 --objdir=$(PATH_OBJECTS) --outdir=$(PATH_OBJECTS) -I../System/Includes -I$(PATH_INCLUDES) $(APPLICATIONS_RULES_PATH_BINARIES)/System.lpp -DCONFIGURATION_APPLICATION_BASE_ADDRESS=$(APPLICATION_BASE_ADDRESS) -P
 
-SOURCES = $(PATH_SOURCES)/File_System.c $(PATH_SOURCES)/Interrupt_Vector_Relocation.asm $(PATH_SOURCES)/Main.c $(PATH_SOURCES)/Menu.c $(PATH_SOURCES)/Menu_Download_File.c $(PATH_SOURCES)/Menu_Start_Program.c
+SOURCES = $(PATH_SOURCES)/File_System.c $(PATH_SOURCES)/Interrupt_Vector_Relocation.asm $(PATH_SOURCES)/Main.c $(PATH_SOURCES)/Menu.c $(PATH_SOURCES)/Menu_Delete_File.c $(PATH_SOURCES)/Menu_Download_File.c $(PATH_SOURCES)/Menu_Start_Program.c
 
 all:
 	$(APPLICATIONS_RULES_C_COMPILER) $(CCFLAGS) $(SOURCES) -O$(BINARY_NAME)

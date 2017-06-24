@@ -19,4 +19,7 @@ void MenuStartProgram(void);
 /** Download a file from the serial port and store it on the external EEPROM. */
 void MenuDownloadFile(void);
 
+/** Mark a file system file slot as empty. */
+void MenuDeleteFile(void);
+
 #endif

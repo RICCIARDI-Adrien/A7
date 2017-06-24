@@ -49,7 +49,7 @@ Start:
 					goto Start;
 		
 				case '3':
-					SystemSerialPortWriteString("menu trouai\r\n");
+					MenuDeleteFile();
 					goto Start;
 					
 				default:
@@ -70,10 +70,6 @@ void main(void)
 	
 	// Load files information from the internal EEPROM
 	FileSystemLoad();
-	
-	// TEST
-	SystemSerialPortWriteString("aaa init string\r\n"); // Sending "aaa" first allows to use UART on RB6 and RB7 pins without being too bored by mikroProg on a Easy PIC 7 MikroElektronika board (value found by chance)
-	SystemSerialPortWriteString("This is a test string\r\n");
 	
 	// Display the main menu forever
 	MainMenu();
