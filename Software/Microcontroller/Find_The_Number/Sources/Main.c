@@ -38,7 +38,15 @@ void main(void)
 	SystemDisplaySetTextCursor(0, 1);
 	SystemDisplayRenderTextString("NOPQRSTUVWXYZ");
 	SystemDisplaySetTextCursor(0, 2);
-	SystemDisplayRenderTextString("0123456789");
+	SystemDisplayRenderTextString("0123456789\201");
+	SystemDisplaySetTextCursor(0, 3);
+	SystemDisplayRenderTextString("abcdefghijklm");
+	SystemDisplaySetTextCursor(0, 4);
+	SystemDisplayRenderTextString("nopqrstuvwxyz");
+	SystemDisplaySetTextCursor(0, 5);
+	SystemDisplayRenderTextString("!\"#$%&'()*+,-./");
+	SystemDisplaySetTextCursor(0, 6);
+	SystemDisplayRenderTextString(":;<=>?@[\\]^_`{|}~");
 	
 	SystemDisplayRenderFrameBuffer();
 	
