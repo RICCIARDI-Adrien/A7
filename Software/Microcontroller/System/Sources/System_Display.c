@@ -44,38 +44,6 @@ static unsigned char System_Display_Text_Cursor_Y = 0;
 /** First 128 ASCII characters sprites. */
 static const unsigned char System_Display_Font_Sprites[][SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH] =
 {
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 0
-	{ 0x7F, 0x41, 0x41, 0x41, 0x7F, 0x00 }, // ASCII code 1 (use its sprite to represent an unknown character)
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 2
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 3
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 4
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 5
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 6
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 7
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 8
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 9
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 10
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 11
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 12
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 13
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 14
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 15
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 16
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 17
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 18
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 19
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 20
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 21
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 22
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 23
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 24
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 25
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 26
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 27
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 28
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 29
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 30
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // ASCII code 31
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // Space
 	{ 0x00, 0x00, 0x4F, 0x00, 0x00, 0x00 }, // Punctuation '!'
 	{ 0x00, 0x07, 0x00, 0x07, 0x00, 0x00 }, // Punctuation '"'
@@ -171,7 +139,7 @@ static const unsigned char System_Display_Font_Sprites[][SYSTEM_DISPLAY_TEXT_CHA
 	{ 0x00, 0x00, 0x7F, 0x00, 0x00, 0x00 }, // Punctuation '|'
 	{ 0x00, 0x41, 0x36, 0x08, 0x00, 0x00 }, // Punctuation '}'
 	{ 0x08, 0x04, 0x08, 0x10, 0x08, 0x00 }, // Punctuation '~'
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} // ASCII code 127 (DEL)
+	{ 0x7F, 0x41, 0x41, 0x41, 0x7F, 0x00 }, // ASCII code 127 (DEL), use its sprite to represent an unknown character
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -461,19 +429,20 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 			// Set cursor to the last line
 			System_Display_Text_Cursor_Y = (SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT) - 1;
 		}
-		
-		// Nothing to display and no cursor coordinate needs to be updated for a new line character
-		if (Character == '\n') return;
 	}
 	
-	// Only ASCII codes from 0 to 127 have corresponding sprite, if the provided character has no sprite display a rectangle telling that the character is unknown
-	if (Character > 127) Character = 1; // ASCII code 1 is never used, so recycle its sprite for the unknown character case
-
-	// Render the character sprite to the frame buffer
-	SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[Character], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
-	
-	// Move text cursor one position on the left
+	// Render the character sprite to the frame buffer (only if the character has a corresponding sprite)
+	if (Character >= 32)
+	{
+		// Only ASCII codes from 32 to 127 have corresponding sprite, if the provided character has no sprite display a rectangle telling that the character is unknown
+		if (Character > 127) Character = 127; // ASCII code 127 is never used, so recycle its sprite for the unknown character case
+		Character -= 32; // Character sprites start from "space" character
+		
+		SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[Character], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
+		
+		// Move text cursor one position on the left
 	System_Display_Text_Cursor_X++;
+	}
 }
 
 void SystemDisplayRenderTextString(const unsigned char *String)
