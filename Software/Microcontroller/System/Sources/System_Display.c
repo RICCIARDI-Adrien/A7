@@ -436,8 +436,35 @@ void SystemDisplaySetTextCursor(unsigned char X, unsigned char Y)
 
 void SystemDisplayRenderTextCharacter(unsigned char Character)
 {
-	// Do nothing if the character go out the display area (clipping optimization)
-	if ((System_Display_Text_Cursor_X >= SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH) || (System_Display_Text_Cursor_Y >= SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT)) return;
+	unsigned short Current_Row_Index, Next_Row_Index = SYSTEM_DISPLAY_WIDTH;
+	
+	// Go to next line beginning if the current character can't be drawn without crossing the display right bound (as '\n' character requires the same handling, check for it here too)
+	if ((System_Display_Text_Cursor_X >= SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH) || (Character == '\n'))
+	{
+		// Go to next line
+		System_Display_Text_Cursor_X = 0;
+		System_Display_Text_Cursor_Y++;
+		
+		// Is the bottom of the screen reached ?
+		if (System_Display_Text_Cursor_Y >= SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT)
+		{
+			// Horizontally scroll display one line up
+			for (Current_Row_Index = 0; Current_Row_Index < ((SYSTEM_DISPLAY_WIDTH * SYSTEM_DISPLAY_HEIGHT) / 8) - SYSTEM_DISPLAY_WIDTH; Current_Row_Index++) // Copy from the first to the last but one line (the last one will be overwritten by new content)
+			{
+				System_Display_Frame_Buffer[Current_Row_Index] = System_Display_Frame_Buffer[Next_Row_Index];
+				Next_Row_Index++;
+			}
+			
+			// Clear last line (Current_Row_Index is pointing on it yet)
+			for ( ; Current_Row_Index < (SYSTEM_DISPLAY_WIDTH * SYSTEM_DISPLAY_HEIGHT) / 8; Current_Row_Index++) System_Display_Frame_Buffer[Current_Row_Index] = 0;
+			
+			// Set cursor to the last line
+			System_Display_Text_Cursor_Y = (SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT) - 1;
+		}
+		
+		// Nothing to display and no cursor coordinate needs to be updated for a new line character
+		if (Character == '\n') return;
+	}
 	
 	// Only ASCII codes from 0 to 127 have corresponding sprite, if the provided character has no sprite display a rectangle telling that the character is unknown
 	if (Character > 127) Character = 1; // ASCII code 1 is never used, so recycle its sprite for the unknown character case
@@ -447,8 +474,6 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 	
 	// Move text cursor one position on the left
 	System_Display_Text_Cursor_X++;
-	
-	// TODO go to next line when cursor reached display width
 }
 
 void SystemDisplayRenderTextString(const unsigned char *String)
