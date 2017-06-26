@@ -406,6 +406,19 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 {
 	unsigned short Current_Row_Index, Next_Row_Index = SYSTEM_DISPLAY_WIDTH;
 	
+	// Render the character sprite to the frame buffer (only if the character has a corresponding sprite)
+	if (Character >= 32)
+	{
+		// Only ASCII codes from 32 to 127 have corresponding sprite, if the provided character has no sprite display a rectangle telling that the character is unknown
+		if (Character > 127) Character = 127; // ASCII code 127 is never used, so recycle its sprite for the unknown character case
+		Character -= 32; // Character sprites start from "space" character
+		
+		SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[Character], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
+		
+		// Move text cursor one position on the left
+		System_Display_Text_Cursor_X++;
+	}
+	
 	// Go to next line beginning if the current character can't be drawn without crossing the display right bound (as '\n' character requires the same handling, check for it here too)
 	if ((System_Display_Text_Cursor_X >= SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH) || (Character == '\n'))
 	{
@@ -429,19 +442,6 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 			// Set cursor to the last line
 			System_Display_Text_Cursor_Y = (SYSTEM_DISPLAY_HEIGHT / SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT) - 1;
 		}
-	}
-	
-	// Render the character sprite to the frame buffer (only if the character has a corresponding sprite)
-	if (Character >= 32)
-	{
-		// Only ASCII codes from 32 to 127 have corresponding sprite, if the provided character has no sprite display a rectangle telling that the character is unknown
-		if (Character > 127) Character = 127; // ASCII code 127 is never used, so recycle its sprite for the unknown character case
-		Character -= 32; // Character sprites start from "space" character
-		
-		SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[Character], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
-		
-		// Move text cursor one position on the left
-	System_Display_Text_Cursor_X++;
 	}
 }
 
