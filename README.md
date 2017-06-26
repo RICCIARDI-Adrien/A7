@@ -37,7 +37,15 @@ Schematics and PCB have been made with Eagle 7.5.
 ![Mother board PCB](https://github.com/RICCIARDI-Adrien/A7/blob/master/Hardware/Mother_Board_PCB.png)
 
 # Software
-Use Microchip XC8 compiler to build software.
+Use Microchip XC8 compiler to build software.  
+You have to add the following environment variable for the build system to find the compiler-provided include files :
+```
+XC8_INCLUDES_PATH
+```
+The variable content must be the full path to the XC8 include directory. Below is an example for a Windows machine (don't forget to add quotation marks if the path contains spaces) :
+```
+"C:\Program Files\Microchip\xc8\v1.42\include"
+```
 
 # Casing
 Casing panels have been drawn with LibreCAD.
