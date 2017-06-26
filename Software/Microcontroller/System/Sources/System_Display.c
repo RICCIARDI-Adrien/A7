@@ -352,12 +352,12 @@ void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned 
 				Sprite_Pixels = *Pointer_Sprite_Pixels;
 				
 				// Draw the begining of the sprite row on the current frame buffer row
-				*Pointer_Frame_Buffer ^= Sprite_Pixels << Y_Remainder;
+				*Pointer_Frame_Buffer = Sprite_Pixels << Y_Remainder;
 				// Draw the end of the sprite row on the next frame buffer row
-				*(Pointer_Frame_Buffer + SYSTEM_DISPLAY_WIDTH) ^= (Sprite_Pixels >> (8 - Y_Remainder));
+				*(Pointer_Frame_Buffer + SYSTEM_DISPLAY_WIDTH) = (Sprite_Pixels >> (8 - Y_Remainder));
 			}
 			// Sprite vertical coordinate is aligned with display rows, there is just need to copy the sprite content
-			else *Pointer_Frame_Buffer ^= *Pointer_Sprite_Pixels;
+			else *Pointer_Frame_Buffer = *Pointer_Sprite_Pixels;
 			
 			Pointer_Frame_Buffer++;
 			Pointer_Sprite_Pixels++;
@@ -405,6 +405,22 @@ void SystemDisplaySetTextCursor(unsigned char X, unsigned char Y)
 void SystemDisplayRenderTextCharacter(unsigned char Character)
 {
 	unsigned short Current_Row_Index, Next_Row_Index = SYSTEM_DISPLAY_WIDTH;
+	
+	// Handle control characters
+	if (Character == '\b')
+	{
+		// Remove the last character of the current line, do nothing if the line is empty (backspace is not allowed to return to the previous lines)
+		if (System_Display_Text_Cursor_X > 0)
+		{
+			System_Display_Text_Cursor_X--;
+			
+			// Write a "space" character at the last line character location
+			SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[0], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
+			
+			// Avoid updating cursor position
+			return;
+		}
+	}
 	
 	// Render the character sprite to the frame buffer (only if the character has a corresponding sprite)
 	if (Character >= 32)
