@@ -27,11 +27,11 @@ void SystemSerialPortInitialize(void)
 unsigned char SystemSerialPortReadByte(void)
 {
 	// Discard an overrun condition (the character stored in the UART reception FIFO can still be read after that)
-	if (RCSTAbits.OERR)
+	if (RCSTA2bits.OERR)
 	{
 		// Disable reception as specified in the datasheet
-		RCSTAbits.CREN = 0;
-		RCSTAbits.CREN = 1; // Re-enable reception
+		RCSTA2bits.CREN = 0;
+		RCSTA2bits.CREN = 1; // Re-enable reception
 	}
 	
 	// Wait for a byte to be received
