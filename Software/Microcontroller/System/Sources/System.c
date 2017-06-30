@@ -62,3 +62,14 @@ void SystemInitialize(void)
 	// Initialize and enable interrupts
 	SystemInterruptInitialize();
 }
+
+void SystemExitProgram(void)
+{
+	// Disable interrupts to avoid perturbating the Programs Manager boot
+	INTCONbits.GIE = 0;
+	
+	// Go to the Programs Manager entry point (could not use "reset" instruction because it seems to hang the keyboard UART)
+	#asm
+		goto 0
+	#endasm
+}

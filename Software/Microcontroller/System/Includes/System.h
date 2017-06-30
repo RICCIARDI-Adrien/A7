@@ -28,4 +28,7 @@
 /** Initialize all system peripherals. This function must be the first call of every application. */
 void SystemInitialize(void);
 
+/** Exit from the current application and return to the Programs Manager. */
+void SystemExitProgram(void);
+
 #endif
