@@ -96,7 +96,9 @@ static inline void MainReadPlayerNumber(unsigned char *String_Number)
 					
 				return;
 				
-			// TODO escape
+			// Escape
+			case SYSTEM_KEYBOARD_KEY_CODE_ESCAPE:
+				SystemExitProgram();
 			
 			default:
 				// Only digits are allowed
@@ -176,7 +178,7 @@ void main(void)
 		{
 			i = SystemKeyboardReadCharacter(); // Recycle 'i' variable
 			if (i == '\n') break;
-			// TODO escape
+			if (i == SYSTEM_KEYBOARD_KEY_CODE_ESCAPE) SystemExitProgram();
 		}
 	}
 }
