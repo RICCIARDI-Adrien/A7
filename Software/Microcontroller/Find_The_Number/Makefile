@@ -1,10 +1,11 @@
 include ../Applications_Rules.mk
 
+PATH_INCLUDES = Includes
 PATH_OBJECTS = Objects
 PATH_SOURCES = Sources
 
 BINARY_NAME = Find_The_Number.hex
-APPLICATIONS_RULES_C_COMPILER_FLAGS += --objdir=$(PATH_OBJECTS) --outdir=$(PATH_OBJECTS)
+APPLICATIONS_RULES_C_COMPILER_FLAGS += --objdir=$(PATH_OBJECTS) --outdir=$(PATH_OBJECTS) -I$(PATH_INCLUDES)
 
 SOURCES = $(PATH_SOURCES)/Main.c
 
