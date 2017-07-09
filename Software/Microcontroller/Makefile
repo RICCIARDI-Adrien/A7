@@ -1,7 +1,7 @@
 # Make some shared variables available to application makefiles
-export APPLICATIONS_RULES_PATH_BINARIES = ../../Binaries
-export APPLICATIONS_RULES_C_COMPILER = xc8
-export APPLICATIONS_RULES_C_COMPILER_FLAGS = --chip=18F26K22 -I../System/Includes -I$(XC8_INCLUDES_PATH) $(APPLICATIONS_RULES_PATH_BINARIES)/System.lpp --codeoffset=0x2000
+export MAIN_MAKEFILE_PATH_BINARIES = ../../Binaries
+export MAIN_MAKEFILE_C_COMPILER = xc8
+export MAIN_MAKEFILE_C_COMPILER_FLAGS = --chip=18F26K22 -I../System/Includes -I$(XC8_INCLUDES_PATH) $(MAIN_MAKEFILE_PATH_BINARIES)/System.lpp --codeoffset=0x2000
 
 # Find all directories (each application stands in a separate directory). Search only in the current directory (do not go into subdirectories), display only the file name with leading "./" removed, ignore "." file
 DIRECTORIES_LIST = $(sort $(shell find . -mindepth 1 -maxdepth 1 -type d -printf "%f "))
