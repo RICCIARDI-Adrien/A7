@@ -5,8 +5,8 @@ export APPLICATIONS_RULES_C_COMPILER_FLAGS = --chip=18F26K22 -I../System/Include
 
 # Find all directories (each application stands in a separate directory). Search only in the current directory (do not go into subdirectories), display only the file name with leading "./" removed, ignore "." file
 DIRECTORIES_LIST = $(sort $(shell find . -mindepth 1 -maxdepth 1 -type d -printf "%f "))
-# Remove the System directory as it must be compiled in an other way
-APPLICATIONS_LIST = $(filter-out System,$(DIRECTORIES_LIST))
+# Remove directories that do not belong in the regular applications category
+APPLICATIONS_LIST = $(filter-out Programs_Manager System,$(DIRECTORIES_LIST))
 
 # Tell "make" to not match the rule names with the existing folders
 .PHONY: $(DIRECTORIES_LIST)
@@ -33,7 +33,14 @@ all: $(APPLICATIONS_LIST)
 clean:
 	echo "TODO"
 
-# System needs specific rules because it can't be downloaded
+# System and Programs Manager need specific rules because they can't be downloaded and System build is slightly different
+# Programs Manager must be explicitly compiled, it is not automatically compiled when executing "all" rule
+Programs_Manager: System
+	cd Programs_Manager && $(MAKE)
+
+Programs_Manager-clean:
+	cd Programs_Manager && $(MAKE) clean
+
 System:
 	cd System && $(MAKE)
 
