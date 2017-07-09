@@ -399,7 +399,7 @@ void SystemKeyboardTimerInterruptHandler(void)
 	RCSTA1bits.CREN = 1;
 	
 	// Reset interrupt flag
-	PIR5bits.TMR6IF = 0; 
+	PIR5bits.TMR6IF = 0;
 }
 
 unsigned char SystemKeyboardReadCharacter(void)
@@ -413,8 +413,8 @@ unsigned char SystemKeyboardReadCharacter(void)
 
 unsigned char SystemKeyboardReadCharacterNoInterrupt(void)
 {
-	// Flush the UART before waiting for a key to discard any previously received character
-	asm("movf RCREG1, W\n"); // Force a read of the UART register to reset the interrupt flag
+	// Enable UART
+	RCSTA1bits.SPEN = 1;
 	
 	// Get bytes from the keyboard until a full character has been received
 	do
@@ -429,6 +429,9 @@ unsigned char SystemKeyboardReadCharacterNoInterrupt(void)
 		__delay_us(256);
 		RCSTA1bits.CREN = 1;
 	} while (!System_Keyboard_Is_Key_Available);
+	
+	// Disable UART to avoid receiving data while not polling for, which would lead to an UART overflow
+	RCSTA1bits.SPEN = 0;
 	
 	// Tell that the character has been retrieved
 	System_Keyboard_Is_Key_Available = 0;
