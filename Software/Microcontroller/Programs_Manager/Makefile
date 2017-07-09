@@ -1,5 +1,3 @@
-include ../Applications_Rules.mk
-
 PATH_INCLUDES = Includes
 PATH_OBJECTS = Objects
 PATH_SOURCES = Sources
