@@ -46,6 +46,11 @@ The variable content must be the full path to the XC8 include directory. Below i
 ```
 "C:\Program Files\Microchip\xc8\v1.42\include"
 ```
+  
+In order to download applications on the A7, you have to set the following environment variable with the serial port device used to communicate with the A7 (like /dev/ttyS0, /dev/ttyUSB0...) :
+```
+A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE
+```
 
 # Casing
 Casing panels have been drawn with LibreCAD.
