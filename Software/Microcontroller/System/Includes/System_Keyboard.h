@@ -45,6 +45,17 @@
 /** "Escape" key code. */
 #define SYSTEM_KEYBOARD_KEY_CODE_ESCAPE 27
 
+/** Tell if the "up arrow" key is pressed or not. */
+#define SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_UP_ARROW (1 << 0)
+/** Tell if the "down arrow" key is pressed or not. */
+#define SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_DOWN_ARROW (1 << 1)
+/** Tell if the "left arrow" key is pressed or not. */
+#define SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_LEFT_ARROW (1 << 2)
+/** Tell if the "right arrow" key is pressed or not. */
+#define SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_RIGHT_ARROW (1 << 3)
+/** Tell if the "space" key is pressed or not. */
+#define SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_SPACE (1 << 4)
+
 //-------------------------------------------------------------------------------------------------
 // Functions
 //-------------------------------------------------------------------------------------------------
@@ -68,5 +79,10 @@ unsigned char SystemKeyboardReadCharacter(void);
  * @return The ASCII code of the last typed key.
  */
 unsigned char SystemKeyboardReadCharacterNoInterrupt(void);
+
+/** Get a bit mask telling which game keys are pressed or released. Use SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_xxx constants to interpret the bit mask.
+ * @return The game keys state bit mask.
+ */
+unsigned char SystemKeyboardReadGameKeysState(void);
 
 #endif

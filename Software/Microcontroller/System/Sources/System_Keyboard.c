@@ -14,6 +14,9 @@ static unsigned char System_Keyboard_Received_Character;
 /** Tell if a new unread key is available. */
 static volatile unsigned char System_Keyboard_Is_Key_Available = 0;
 
+/** Maintain a bit map telling which "game" keys are pressed and which are released. */
+static volatile unsigned char System_Keyboard_Game_Keys_State_Bit_Mask = 0;
+
 /** Characters issued when no modifier key is pressed (AZERTY mapping). */
 static unsigned char System_Keyboard_Lowercase_Characters[] =
 {
@@ -306,7 +309,7 @@ void SystemKeyboardInitialize(void)
 void SystemKeyboardUARTInterruptHandler(void)
 {
 	static unsigned char Is_Break_Code_Received = 0, Is_Extended_Code_Received = 0, Is_Left_Shift_Pressed = 0, Is_Right_Shift_Pressed = 0;
-	unsigned char Received_Byte, Is_Most_Significant_Bit_Set, Is_Extended_Character_Replaced = 1;
+	unsigned char Received_Byte, Is_Most_Significant_Bit_Set;
 	
 	// Immediately stop UART reception to avoid shifting the remaining bit, which would corrupt the next received byte
 	RCSTA1bits.CREN = 0;
@@ -337,18 +340,69 @@ void SystemKeyboardUARTInterruptHandler(void)
 		return;
 	}
 	
-	// If the last received key was the break code, do not take the key into account
+	// Handle key release
 	if (Is_Break_Code_Received)
 	{
+		// Keys using extended code
+		if (Is_Extended_Code_Received)
+		{
+			switch (Received_Byte)
+			{
+				// Left arrow game key
+				case 0x6B:
+					System_Keyboard_Game_Keys_State_Bit_Mask &= ~SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_LEFT_ARROW;
+					break;
+					
+				// Down arrow game key
+				case 0x72:
+					System_Keyboard_Game_Keys_State_Bit_Mask &= ~SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_DOWN_ARROW;
+					break;
+					
+				// Right arrow game key
+				case 0x74:
+					System_Keyboard_Game_Keys_State_Bit_Mask &= ~SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_RIGHT_ARROW;
+					break;
+					
+				// Up arrow game key
+				case 0x75:
+					System_Keyboard_Game_Keys_State_Bit_Mask &= ~SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_UP_ARROW;
+					break;
+					
+				default:
+					break;
+			}
+		}
+		// Keys using normal code
+		else
+		{
+			switch (Received_Byte)
+			{
+				// Left shift
+				case 0x12:
+					Is_Left_Shift_Pressed = 0;
+					break;
+					
+				// Space game key
+				case 0x29:
+					System_Keyboard_Game_Keys_State_Bit_Mask &= ~SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_SPACE;
+					break;
+					
+				// Right shift
+				case 0x59:
+					Is_Right_Shift_Pressed = 0;
+					break;
+					
+				default:
+					break;
+			}
+		}
+		
 		Is_Break_Code_Received = 0;
 		Is_Extended_Code_Received = 0; // Also reset extended code flag in case it was an extended key break code that was just discarded
-		
-		// Are the shift keys released ?
-		if (Received_Byte == 0x12) Is_Left_Shift_Pressed = 0;
-		if (Received_Byte == 0x59) Is_Right_Shift_Pressed = 0;
 		return;
 	}
 	
+	// Handle key press
 	// Keep only some extended characters (avoid loosing a whole dedicated table space in RAM)
 	if (Is_Extended_Code_Received)
 	{
@@ -359,21 +413,40 @@ void SystemKeyboardUARTInterruptHandler(void)
 			// Key pad '/'
 			case 0x4A:
 				System_Keyboard_Received_Character = '/';
+				System_Keyboard_Is_Key_Available = 1;
 				break;
 				
 			// Key pad enter
 			case 0x5A:
 				System_Keyboard_Received_Character = '\n';
+				System_Keyboard_Is_Key_Available = 1;
 				break;
 				
-			// In all other case the character was not replaced
+			// Handle game keys in the same time
+			// Left arrow
+			case 0x6B:
+				System_Keyboard_Game_Keys_State_Bit_Mask |= SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_LEFT_ARROW;
+				break;
+				
+			// Down arrow
+			case 0x72:
+				System_Keyboard_Game_Keys_State_Bit_Mask |= SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_DOWN_ARROW;
+				break;
+				
+			// Right arrow
+			case 0x74:
+				System_Keyboard_Game_Keys_State_Bit_Mask |= SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_RIGHT_ARROW;
+				break;
+				
+			// Up arrow
+			case 0x75:
+				System_Keyboard_Game_Keys_State_Bit_Mask |= SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_UP_ARROW;
+				break;
+				
 			default:
-				Is_Extended_Character_Replaced = 0;
 				break;
 		}
-		
-		if (Is_Extended_Character_Replaced) System_Keyboard_Is_Key_Available = 1;
-	}		
+	}
 	// This is a normal code, get its translation from the table
 	else if (Received_Byte < sizeof(System_Keyboard_Lowercase_Characters)) // Make sure the key is not out of the table bounds (all tables have same size)
 	{
@@ -387,6 +460,10 @@ void SystemKeyboardUARTInterruptHandler(void)
 			else System_Keyboard_Received_Character = System_Keyboard_Lowercase_Characters[Received_Byte];
 			System_Keyboard_Is_Key_Available = 1;
 		}
+		
+		// Handle normal game keys
+		// Space
+		if (Received_Byte == 0x29) System_Keyboard_Game_Keys_State_Bit_Mask |= SYSTEM_KEYBOARD_GAME_KEY_STATE_BIT_MASK_SPACE;
 	}
 }
 
@@ -437,4 +514,9 @@ unsigned char SystemKeyboardReadCharacterNoInterrupt(void)
 	System_Keyboard_Is_Key_Available = 0;
 	
 	return System_Keyboard_Received_Character;
+}
+
+unsigned char SystemKeyboardReadGameKeysState(void)
+{
+	return System_Keyboard_Game_Keys_State_Bit_Mask;
 }
