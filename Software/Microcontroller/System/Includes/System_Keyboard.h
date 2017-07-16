@@ -85,4 +85,10 @@ unsigned char SystemKeyboardReadCharacterNoInterrupt(void);
  */
 unsigned char SystemKeyboardReadGameKeysState(void);
 
+/** Tell whether a key is available to read without blocking.
+ * @return 0 if no key is available,
+ * @return 1 if a key is available.
+ */
+unsigned char SystemKeyboardIsKeyAvailable(void);
+
 #endif

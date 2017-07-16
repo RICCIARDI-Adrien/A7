@@ -520,3 +520,8 @@ unsigned char SystemKeyboardReadGameKeysState(void)
 {
 	return System_Keyboard_Game_Keys_State_Bit_Mask;
 }
+
+unsigned char SystemKeyboardIsKeyAvailable(void)
+{
+	return System_Keyboard_Is_Key_Available;
+}
