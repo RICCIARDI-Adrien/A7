@@ -351,13 +351,13 @@ void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned 
 				// Cache sprite pixels value
 				Sprite_Pixels = *Pointer_Sprite_Pixels;
 				
-				// Draw the begining of the sprite row on the current frame buffer row
-				*Pointer_Frame_Buffer = Sprite_Pixels << Y_Remainder;
+				// Draw the beginning of the sprite row on the current frame buffer row
+				*Pointer_Frame_Buffer ^= Sprite_Pixels << Y_Remainder;
 				// Draw the end of the sprite row on the next frame buffer row
-				*(Pointer_Frame_Buffer + SYSTEM_DISPLAY_WIDTH) = (Sprite_Pixels >> (8 - Y_Remainder));
+				*(Pointer_Frame_Buffer + SYSTEM_DISPLAY_WIDTH) ^= (Sprite_Pixels >> (8 - Y_Remainder));
 			}
 			// Sprite vertical coordinate is aligned with display rows, there is just need to copy the sprite content
-			else *Pointer_Frame_Buffer = *Pointer_Sprite_Pixels;
+			else *Pointer_Frame_Buffer ^= *Pointer_Sprite_Pixels;
 			
 			Pointer_Frame_Buffer++;
 			Pointer_Sprite_Pixels++;
@@ -405,6 +405,7 @@ void SystemDisplaySetTextCursor(unsigned char X, unsigned char Y)
 void SystemDisplayRenderTextCharacter(unsigned char Character)
 {
 	unsigned short Current_Row_Index, Next_Row_Index = SYSTEM_DISPLAY_WIDTH;
+	unsigned char i;
 	
 	// Handle control characters
 	if (Character == '\b')
@@ -414,8 +415,13 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 		{
 			System_Display_Text_Cursor_X--;
 			
-			// Write a "space" character at the last line character location
-			SystemDisplayRenderSprite(System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT, System_Display_Font_Sprites[0], SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT);
+			// Write a "space" character at the last line character location TODO use a real rendering function if the text is not aligned on a display byte
+			Current_Row_Index = (System_Display_Text_Cursor_Y * (SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH)) + (System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH); // Recycle Current_Row_Index variable
+			for (i = 0; i < SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH; i++)
+			{
+				System_Display_Frame_Buffer[Current_Row_Index] = 0;
+				Current_Row_Index++;
+			}
 			
 			// Avoid updating cursor position
 			return;
