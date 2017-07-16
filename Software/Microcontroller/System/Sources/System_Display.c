@@ -339,6 +339,7 @@ void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned 
 	
 	// A whole byte contains the pixels for 8 consecutive vertical rows, so adjust height to talk in bytes to make drawing operation easier and faster
 	Height >>= 3; // Due to display module hardware, height is always a multiple of 8
+	if (Height == 0) Height = 1; // Allow to draw sprites with an height less than 8 pixels
 	
 	// XOR the sprite bits with the current one in the frame buffer
 	for (Y = 0; Y < Height; Y++) // Y variable is not needed anymore, recycle it
