@@ -25,5 +25,5 @@ void SystemInterruptInitialize(void)
 {
 	// Use only high-priority interrupts
 	RCONbits.IPEN = 0; // Disable interrupts priority levels
-	INTCON = 0xC0; // Enable al unmasked interrupts, enable all unmasked peripheral interrupts
+	INTCON = 0xC0; // Enable all unmasked interrupts, enable all unmasked peripheral interrupts
 }
