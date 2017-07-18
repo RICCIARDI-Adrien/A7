@@ -42,16 +42,7 @@
 //-------------------------------------------------------------------------------------------------
 void SystemInitialize(void)
 {
-	// Start timer 4 before everything else to make it count with a non-stable input clock, so the timer value is random
-	T4CON = 0x04; // Enable the timer with a 1:1 prescaler and 1:1 postscaler
-	
-	// Set oscillator frequency to 64MHz
-	OSCCON = 0x78; // Core enters sleep mode when issuing a SLEEP instruction, select 16MHz frequency for high frequency internal oscillator, device is running from primary clock (set as "internal oscillator" in configuration registers)
-	while (!OSCCONbits.HFIOFS); // Wait for the internal oscillator to stabilize
-	OSCCON2 = 0x04; // Turn off secondary oscillator, enable primary oscillator drive circuit
-	OSCTUNEbits.PLLEN = 1; // Enable 4x PLL
-	
-	// Initialize peripherals
+	// Reinitialize peripherals to reset them
 	SystemKeyboardInitialize();
 	SystemSerialPortInitialize();
 	SystemDisplayInitialize();
@@ -63,13 +54,32 @@ void SystemInitialize(void)
 	SystemInterruptInitialize();
 }
 
+void SystemInitializeProgramsManager(void)
+{
+	// Start timer 4 before everything else to make it count with a non-stable input clock, so the timer value is random
+	T4CON = 0x04; // Enable the timer with a 1:1 prescaler and 1:1 postscaler
+	
+	// Set oscillator frequency to 64MHz
+	OSCCON = 0x78; // Core enters sleep mode when issuing a SLEEP instruction, select 16MHz frequency for high frequency internal oscillator, device is running from primary clock (set as "internal oscillator" in configuration registers)
+	while (!OSCCONbits.HFIOFS); // Wait for the internal oscillator to stabilize
+	OSCCON2 = 0x04; // Turn off secondary oscillator, enable primary oscillator drive circuit
+	OSCTUNEbits.PLLEN = 1; // Enable 4x PLL
+	
+	// Initialize peripherals needed by the Programs Manager
+	SystemKeyboardInitialize();
+	SystemSerialPortInitialize();
+	SystemDisplayInitialize();
+	SystemExternalEEPROMInitialize();
+	SystemLedInitialize();
+}
+
 void SystemExitProgram(void)
 {
-	// Disable interrupts to avoid perturbating the Programs Manager boot
+	// Disable interrupts to avoid perturbing the Programs Manager boot
 	INTCONbits.GIE = 0;
 	
-	// Go to the Programs Manager entry point (could not use "reset" instruction because it seems to hang the keyboard UART)
+	// Go to the Programs Manager entry point by resetting the core
 	#asm
-		goto 0
+		reset
 	#endasm
 }

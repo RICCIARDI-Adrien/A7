@@ -28,6 +28,9 @@
 /** Initialize all system peripherals. This function must be the first call of every application. */
 void SystemInitialize(void);
 
+/** Special initialization for the Programs Manager, this is a more low-level initialization and it does not enable interrupts. */
+void SystemInitializeProgramsManager(void);
+
 /** Exit from the current application and return to the Programs Manager. */
 void SystemExitProgram(void);
 

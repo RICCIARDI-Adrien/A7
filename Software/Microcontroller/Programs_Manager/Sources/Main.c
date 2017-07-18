@@ -64,9 +64,8 @@ Start:
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	// Initialize needed peripherals
-	SystemInitialize(); // This function automatically enables interrupts
-	INTCON = 0; // Immediately disable interrupts as they can't be used in this program because it is relocated at the end of the program memory (so the interrupt vectors are not available)
+	// Configure low-level hardware and only needed peripherals
+	SystemInitializeProgramsManager();
 	
 	// Load files information from the internal EEPROM
 	FileSystemLoad();
