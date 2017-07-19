@@ -57,7 +57,7 @@ static unsigned char MainGetCellState(unsigned char *Pointer_World, unsigned cha
 	unsigned char Cells_State, Is_Cell_Alive, Bit_Index;
 	
 	// Retrieve the byte the cells are stored in
-	Cells_State = Pointer_World[((Row * MAIN_WORLD_WIDTH_CELLS) + Column) >> 3]; // Fastly divide by 8 by doing a shift
+	Cells_State = Pointer_World[((Row * MAIN_WORLD_WIDTH_CELLS) + Column) >> 3]; // Fast divide by 8 by doing a shift
 	
 	// Extract the requested bit
 	Bit_Index = Column & 0x07; // Ultrafast modulo 8 operation
@@ -79,7 +79,7 @@ static void MainSetCellState(unsigned char *Pointer_World, unsigned char Row, un
 	unsigned short Cells_State_Index;
 	
 	// Retrieve the byte the cells are stored in
-	Cells_State_Index = ((Row * MAIN_WORLD_WIDTH_CELLS) + Column) >> 3; // Fastly divide by 8 by doing a shift
+	Cells_State_Index = ((Row * MAIN_WORLD_WIDTH_CELLS) + Column) >> 3; // Fast divide by 8 by doing a shift
 	Cells_State = Pointer_World[Cells_State_Index];
 	
 	// Set the new cell state
@@ -171,7 +171,7 @@ static inline void MainComputeNextGeneration(void)
  */
 static inline unsigned char MainIsWorldEvolving(void)
 {
-	// Checking if current and previous generations are the same allows to detect a completely hanged world
+	// Checking if current and previous generations are the same allows to detect a completely hanged world (this also works by checking with current and before last generations, and allows to display the stuck world). Checking current against before last generations allows to detect 2-period oscillators
 	if (memcmp(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], MAIN_WORLD_SIZE_BYTES) == 0) return 0;
 	
 	return 1;
@@ -208,7 +208,7 @@ static inline void MainDisplayWorld(void)
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	unsigned char Key;
+	unsigned char Key, Is_Fast_Mode_Enabled = 0;
 	
 	SystemInitialize();
 	
@@ -228,6 +228,12 @@ void main(void)
 				if (Key == SYSTEM_KEYBOARD_KEY_CODE_ESCAPE) SystemExitProgram();
 				// Generate a new world if the 'n' key is pressed
 				if (Key == 'n') break;
+				// Toggle fast mode
+				if (Key == 'f')
+				{
+					if (Is_Fast_Mode_Enabled) Is_Fast_Mode_Enabled = 0;
+					else Is_Fast_Mode_Enabled = 1;
+				}
 			}
 			
 			// Show world state (show it before computing the next generation to see what the generated world looks like)
@@ -240,7 +246,7 @@ void main(void)
 			if (!MainIsWorldEvolving()) break;
 			
 			// Wait a bit to let the watchers understand what is happening
-			__delay_ms(250);
+			if (!Is_Fast_Mode_Enabled) __delay_ms(250);
 		}
 	}
 }
