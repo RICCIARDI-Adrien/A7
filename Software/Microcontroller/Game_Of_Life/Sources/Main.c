@@ -21,17 +21,8 @@
 /** Cell sprite height in pixels. */
 #define MAIN_CELL_SPRITE_HEIGHT_PIXELS 2
 
-//-------------------------------------------------------------------------------------------------
-// Private types
-//-------------------------------------------------------------------------------------------------
-/** All remembered generations. */
-typedef enum
-{
-	MAIN_GENERATION_ID_CURRENT, //!< Current world generation, this is the one which is displayed.
-	MAIN_GENERATION_ID_PREVIOUS, //!< Previous generation. Is is only a placeholder for the before last generation.
-	MAIN_GENERATION_ID_BEFORE_LAST, //!< Keep this generation to compare with the current one. It allows to detect hanged worlds or some simple oscillators.
-	MAIN_GENERATION_IDS_COUNT
-} TMainGenerationID;
+/** How many generations are kept to check for hanged worlds. */
+#define MAIN_WORLD_GENERATIONS_COUNT 7
 
 //-------------------------------------------------------------------------------------------------
 // Private variables
@@ -40,7 +31,7 @@ typedef enum
 static const unsigned char Main_Cell_Sprite[] = { 0x03, 0x03 };
 
 /** Useful world generations. */
-static unsigned char Main_World_Generations[MAIN_GENERATION_IDS_COUNT][MAIN_WORLD_SIZE_BYTES];
+static unsigned char Main_World_Generations[MAIN_WORLD_GENERATIONS_COUNT][MAIN_WORLD_SIZE_BYTES]; // Current generation is index 0
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -95,9 +86,9 @@ static inline void MainGenerateWorld(void)
 	unsigned char Row, Column, Random_Value, Is_Cell_Alive;
 	
 	// Reset previous generations to be sure they won't match with the newly generated world
-	memset(Main_World_Generations[MAIN_GENERATION_ID_PREVIOUS], 0, MAIN_WORLD_SIZE_BYTES);
-	memset(Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], 0, MAIN_WORLD_SIZE_BYTES);
+	for (Row = 1; Row < MAIN_WORLD_GENERATIONS_COUNT; Row++) memset(Main_World_Generations[Row], 0, MAIN_WORLD_SIZE_BYTES); // Recycle "Row" variable
 	
+	// Generate a new current world
 	for (Row = 0; Row < MAIN_WORLD_HEIGHT_CELLS; Row++)
 	{
 		for (Column = 0; Column < MAIN_WORLD_WIDTH_CELLS; Column++)
@@ -107,7 +98,7 @@ static inline void MainGenerateWorld(void)
 			if (Random_Value == 2) Is_Cell_Alive = 1;
 			else Is_Cell_Alive = 0;
 			
-			MainSetCellState(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Row, Column, Is_Cell_Alive);
+			MainSetCellState(Main_World_Generations[0], Row, Column, Is_Cell_Alive);
 		}
 	}
 }
@@ -116,14 +107,14 @@ static inline void MainGenerateWorld(void)
 static inline void MainComputeNextGeneration(void)
 {
 	static unsigned char World_Next_Generation[MAIN_WORLD_SIZE_BYTES];
-	unsigned char Row, Column, Neighbor_Cells_Count, Is_Cell_Alive, *Pointer_World_Current_Generation = Main_World_Generations[MAIN_GENERATION_ID_CURRENT];
+	unsigned char Row, Column, Neighbor_Cells_Count, Is_Cell_Alive, *Pointer_World_Current_Generation = Main_World_Generations[0];
 	
 	SystemLedOn();
 	
-	// Save previous generations
-	memcpy(Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], Main_World_Generations[MAIN_GENERATION_ID_PREVIOUS], MAIN_WORLD_SIZE_BYTES);
-	memcpy(Main_World_Generations[MAIN_GENERATION_ID_PREVIOUS], Pointer_World_Current_Generation, MAIN_WORLD_SIZE_BYTES);
+	// Save previous generations (replace the oldest one by the old one and so on)
+	for (Row = MAIN_WORLD_GENERATIONS_COUNT - 1; Row > 0; Row--) memcpy(Main_World_Generations[Row], Main_World_Generations[Row - 1], MAIN_WORLD_SIZE_BYTES); // Recycle "Row" variable
 	
+	// Handle all current world cells
 	for (Row = 0; Row < MAIN_WORLD_HEIGHT_CELLS; Row++)
 	{
 		for (Column = 0; Column < MAIN_WORLD_WIDTH_CELLS; Column++)
@@ -172,7 +163,10 @@ static inline void MainComputeNextGeneration(void)
 static inline unsigned char MainIsWorldEvolving(void)
 {
 	// Checking if current and previous generations are the same allows to detect a completely hanged world (this also works by checking with current and before last generations, and allows to display the stuck world). Checking current against before last generations allows to detect 2-period oscillators
-	if (memcmp(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], MAIN_WORLD_SIZE_BYTES) == 0) return 0;
+	if (memcmp(Main_World_Generations[0], Main_World_Generations[2], MAIN_WORLD_SIZE_BYTES) == 0) return 0;
+	
+	// Three-period oscillators and 2-period ones are synchronized only one time out of six, so we have to check the current generation against the older 6th to discard 3-period oscillators
+	if (memcmp(Main_World_Generations[0], Main_World_Generations[6], MAIN_WORLD_SIZE_BYTES) == 0) return 0;
 	
 	return 1;
 }
@@ -189,7 +183,7 @@ static inline void MainDisplayWorld(void)
 		for (Cell_Column = 0; Cell_Column < MAIN_WORLD_WIDTH_CELLS; Cell_Column++)
 		{
 			// Display the sprite only if the cell is alive
-			if (MainGetCellState(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Cell_Row, Cell_Column)) SystemDisplayRenderSprite(Sprite_Column, Sprite_Row, Main_Cell_Sprite, MAIN_CELL_SPRITE_WIDTH_PIXELS, MAIN_CELL_SPRITE_HEIGHT_PIXELS);
+			if (MainGetCellState(Main_World_Generations[0], Cell_Row, Cell_Column)) SystemDisplayRenderSprite(Sprite_Column, Sprite_Row, Main_Cell_Sprite, MAIN_CELL_SPRITE_WIDTH_PIXELS, MAIN_CELL_SPRITE_HEIGHT_PIXELS);
 			
 			// Update sprite coordinates
 			Sprite_Column += MAIN_CELL_SPRITE_WIDTH_PIXELS;
