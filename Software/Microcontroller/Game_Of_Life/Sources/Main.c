@@ -13,10 +13,25 @@
 /** How many cells on a column. */
 #define MAIN_WORLD_HEIGHT_CELLS 32
 
+/** How many RAM a world requires. */
+#define MAIN_WORLD_SIZE_BYTES ((MAIN_WORLD_WIDTH_CELLS * MAIN_WORLD_HEIGHT_CELLS) / 8) // Divide by 8 because cell states are stored on a single bit
+
 /** Cell sprite width in pixels. */
 #define MAIN_CELL_SPRITE_WIDTH_PIXELS 2
 /** Cell sprite height in pixels. */
 #define MAIN_CELL_SPRITE_HEIGHT_PIXELS 2
+
+//-------------------------------------------------------------------------------------------------
+// Private types
+//-------------------------------------------------------------------------------------------------
+/** All remembered generations. */
+typedef enum
+{
+	MAIN_GENERATION_ID_CURRENT, //!< Current world generation, this is the one which is displayed.
+	MAIN_GENERATION_ID_PREVIOUS, //!< Previous generation. Is is only a placeholder for the before last generation.
+	MAIN_GENERATION_ID_BEFORE_LAST, //!< Keep this generation to compare with the current one. It allows to detect hanged worlds or some simple oscillators.
+	MAIN_GENERATION_IDS_COUNT
+} TMainGenerationID;
 
 //-------------------------------------------------------------------------------------------------
 // Private variables
@@ -24,8 +39,8 @@
 /** A cell sprite (a 2x2 pixels square). */
 static const unsigned char Main_Cell_Sprite[] = { 0x03, 0x03 };
 
-/** The current generation. */
-static unsigned char Main_World_Current_Generation[(MAIN_WORLD_WIDTH_CELLS * MAIN_WORLD_HEIGHT_CELLS) / 8]; // Divide by 8 because cell states are stored on a single bit
+/** Useful world generations. */
+static unsigned char Main_World_Generations[MAIN_GENERATION_IDS_COUNT][MAIN_WORLD_SIZE_BYTES];
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -79,6 +94,10 @@ static inline void MainGenerateWorld(void)
 {
 	unsigned char Row, Column, Random_Value, Is_Cell_Alive;
 	
+	// Reset previous generations to be sure they won't match with the newly generated world
+	memset(Main_World_Generations[MAIN_GENERATION_ID_PREVIOUS], 0, MAIN_WORLD_SIZE_BYTES);
+	memset(Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], 0, MAIN_WORLD_SIZE_BYTES);
+	
 	for (Row = 0; Row < MAIN_WORLD_HEIGHT_CELLS; Row++)
 	{
 		for (Column = 0; Column < MAIN_WORLD_WIDTH_CELLS; Column++)
@@ -88,7 +107,7 @@ static inline void MainGenerateWorld(void)
 			if (Random_Value == 2) Is_Cell_Alive = 1;
 			else Is_Cell_Alive = 0;
 			
-			MainSetCellState(Main_World_Current_Generation, Row, Column, Is_Cell_Alive);
+			MainSetCellState(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Row, Column, Is_Cell_Alive);
 		}
 	}
 }
@@ -96,10 +115,14 @@ static inline void MainGenerateWorld(void)
 /** Apply game of life rules on the current generation and generate the next generation (still stored in Main_World_Current_Generation array). */
 static inline void MainComputeNextGeneration(void)
 {
-	static unsigned char World_Next_Generation[sizeof(Main_World_Current_Generation)];
-	unsigned char Row, Column, Neighbor_Cells_Count, Is_Cell_Alive;
+	static unsigned char World_Next_Generation[MAIN_WORLD_SIZE_BYTES];
+	unsigned char Row, Column, Neighbor_Cells_Count, Is_Cell_Alive, *Pointer_World_Current_Generation = Main_World_Generations[MAIN_GENERATION_ID_CURRENT];
 	
 	SystemLedOn();
+	
+	// Save previous generations
+	memcpy(Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], Main_World_Generations[MAIN_GENERATION_ID_PREVIOUS], MAIN_WORLD_SIZE_BYTES);
+	memcpy(Main_World_Generations[MAIN_GENERATION_ID_PREVIOUS], Pointer_World_Current_Generation, MAIN_WORLD_SIZE_BYTES);
 	
 	for (Row = 0; Row < MAIN_WORLD_HEIGHT_CELLS; Row++)
 	{
@@ -108,26 +131,26 @@ static inline void MainComputeNextGeneration(void)
 			// Compute how many alive neighbors a cell has
 			Neighbor_Cells_Count = 0;
 			// North-west from the current cell
-			if ((Row > 0) && (Column > 0)) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row - 1, Column - 1);
+			if ((Row > 0) && (Column > 0)) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row - 1, Column - 1);
 			// North from the current cell
-			if (Row > 0) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row - 1, Column);
+			if (Row > 0) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row - 1, Column);
 			// North-east from the current cell
-			if ((Row > 0) && (Column < MAIN_WORLD_WIDTH_CELLS - 1)) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row - 1, Column + 1);
+			if ((Row > 0) && (Column < MAIN_WORLD_WIDTH_CELLS - 1)) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row - 1, Column + 1);
 			// West from the current cell
-			if (Column > 0) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row, Column - 1);
+			if (Column > 0) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row, Column - 1);
 			// East from the current cell
-			if (Column < MAIN_WORLD_WIDTH_CELLS - 1) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row, Column + 1);
+			if (Column < MAIN_WORLD_WIDTH_CELLS - 1) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row, Column + 1);
 			// South-west from the current cell
-			if ((Row < MAIN_WORLD_HEIGHT_CELLS - 1) && (Column > 0)) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row + 1, Column - 1);
+			if ((Row < MAIN_WORLD_HEIGHT_CELLS - 1) && (Column > 0)) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row + 1, Column - 1);
 			// South from the current cell
-			if (Row < MAIN_WORLD_HEIGHT_CELLS - 1) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row + 1, Column);
+			if (Row < MAIN_WORLD_HEIGHT_CELLS - 1) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row + 1, Column);
 			// South-east from the current cell
-			if ((Row < MAIN_WORLD_HEIGHT_CELLS - 1) && (Column < MAIN_WORLD_WIDTH_CELLS - 1)) Neighbor_Cells_Count += MainGetCellState(Main_World_Current_Generation, Row + 1, Column + 1);
+			if ((Row < MAIN_WORLD_HEIGHT_CELLS - 1) && (Column < MAIN_WORLD_WIDTH_CELLS - 1)) Neighbor_Cells_Count += MainGetCellState(Pointer_World_Current_Generation, Row + 1, Column + 1);
 			
 			// A cell is born if there are exactly 3 alive neighbors
 			if (Neighbor_Cells_Count == 3) Is_Cell_Alive = 1;
 			// Cell stays in its current state if it has exactly 2 alive neighbors
-			else if (Neighbor_Cells_Count == 2) Is_Cell_Alive = MainGetCellState(Main_World_Current_Generation, Row, Column);
+			else if (Neighbor_Cells_Count == 2) Is_Cell_Alive = MainGetCellState(Pointer_World_Current_Generation, Row, Column);
 			// In all other case an alive cell dies, or a yet-died cell does not return to life
 			else Is_Cell_Alive = 0;
 			
@@ -137,9 +160,21 @@ static inline void MainComputeNextGeneration(void)
 	}
 	
 	// Next generation is fully generated, copy it to the current one
-	memcpy(Main_World_Current_Generation, World_Next_Generation, sizeof(Main_World_Current_Generation));
+	memcpy(Pointer_World_Current_Generation, World_Next_Generation, MAIN_WORLD_SIZE_BYTES);
 	
 	SystemLedOff();
+}
+
+/** Check if the current world can evolve or if it is stuck in an infinite loop.
+ * @return 0 if the world can't evolve anymore,
+ * @return 1 if the world is still evolving.
+ */
+static inline unsigned char MainIsWorldEvolving(void)
+{
+	// Checking if current and previous generations are the same allows to detect a completely hanged world
+	if (memcmp(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Main_World_Generations[MAIN_GENERATION_ID_BEFORE_LAST], MAIN_WORLD_SIZE_BYTES) == 0) return 0;
+	
+	return 1;
 }
 
 /** Display the world current generation. */
@@ -154,7 +189,7 @@ static inline void MainDisplayWorld(void)
 		for (Cell_Column = 0; Cell_Column < MAIN_WORLD_WIDTH_CELLS; Cell_Column++)
 		{
 			// Display the sprite only if the cell is alive
-			if (MainGetCellState(Main_World_Current_Generation, Cell_Row, Cell_Column)) SystemDisplayRenderSprite(Sprite_Column, Sprite_Row, Main_Cell_Sprite, MAIN_CELL_SPRITE_WIDTH_PIXELS, MAIN_CELL_SPRITE_HEIGHT_PIXELS);
+			if (MainGetCellState(Main_World_Generations[MAIN_GENERATION_ID_CURRENT], Cell_Row, Cell_Column)) SystemDisplayRenderSprite(Sprite_Column, Sprite_Row, Main_Cell_Sprite, MAIN_CELL_SPRITE_WIDTH_PIXELS, MAIN_CELL_SPRITE_HEIGHT_PIXELS);
 			
 			// Update sprite coordinates
 			Sprite_Column += MAIN_CELL_SPRITE_WIDTH_PIXELS;
@@ -195,11 +230,14 @@ void main(void)
 				if (Key == 'n') break;
 			}
 			
-			// Show world state
+			// Show world state (show it before computing the next generation to see what the generated world looks like)
 			MainDisplayWorld();
 			
 			// Simulate world
 			MainComputeNextGeneration();
+			
+			// Generate a new world if this one is stuck
+			if (!MainIsWorldEvolving()) break;
 			
 			// Wait a bit to let the watchers understand what is happening
 			__delay_ms(250);
