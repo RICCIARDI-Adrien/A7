@@ -44,8 +44,8 @@ static unsigned char AES_Substitution_Box[16][16] =
 // Private functions
 //-------------------------------------------------------------------------------------------------
 /** Substitute bytes from the input buffer using the S-box. This is the SubBytes() step of the specification.
- * @param Pointer_Input_Buffer The data to substitute.
- * @param Pointer_Output_Buffer On output, contain the substituted data.
+ * @param Pointer_Input_Buffer The data to substitute. TODO state
+ * @param Pointer_Output_Buffer On output, contain the substituted data. TODO state
  */
 static void AESStepSubstituteBytes(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer_Output_Buffer)
 {
@@ -97,4 +97,22 @@ static void AESStepShiftRows(unsigned char Pointer_Input_State[][AES_STATE_COLUM
 	Pointer_Output_State[3][1] = Pointer_Input_State[3][0];
 	Pointer_Output_State[3][2] = Pointer_Input_State[3][1];
 	Pointer_Output_State[3][3] = Pointer_Input_State[3][2];
+}
+
+/** Execute the MixColumns() AES step.
+ * @param Pointer_Input_State The state to mix columns.
+ * @param Pointer_Output_State On output, contains mixed columns state.
+ */
+static void AESStepMixColumns(unsigned char Pointer_Input_State[][AES_STATE_COLUMNS_COUNT], unsigned char Pointer_Output_State[][AES_STATE_COLUMNS_COUNT])
+{
+	unsigned char i;
+	
+	for (i = 0; i < AES_STATE_COLUMNS_COUNT; i++)
+	{
+		// Compute column values
+		Pointer_Output_State[0][i] = (2 * Pointer_Input_State[0][i]) ^ (3 * Pointer_Input_State[1][i]) ^ Pointer_Input_State[2][i] ^ Pointer_Input_State[3][i];
+		Pointer_Output_State[1][i] = Pointer_Input_State[0][i] ^ (2 * Pointer_Input_State[1][i]) ^ (3 * Pointer_Input_State[2][i]) ^ Pointer_Input_State[3][i];
+		Pointer_Output_State[2][i] = Pointer_Input_State[0][i] ^ Pointer_Input_State[1][i] ^ (2 * Pointer_Input_State[2][i]) ^ (3 * Pointer_Input_State[3][i]);
+		Pointer_Output_State[3][i] = (3 * Pointer_Input_State[0][i]) ^ Pointer_Input_State[1][i] ^ Pointer_Input_State[2][i] ^ (2 * Pointer_Input_State[3][i]);
+	}
 }
