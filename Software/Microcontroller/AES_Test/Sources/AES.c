@@ -69,32 +69,32 @@ static void AESStepSubstituteBytes(unsigned char *Pointer_Input_Buffer, unsigned
 }
 
 /** Rotate row 1 to one position on the left, row 2 to two positions on the left and row 3 to three positions on the left.
- * @param Pointer_Input_Buffer The data to shift.
- * @param Pointer_Output_Buffer On output, contain the shifted data.
+ * @param Pointer_Input_State The state to shift.
+ * @param Pointer_Output_State On output, contain the shifted state.
  */
-static void AESStepShiftRows(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer_Output_Buffer)
+static void AESStepShiftRows(unsigned char Pointer_Input_State[][AES_STATE_COLUMNS_COUNT], unsigned char Pointer_Output_State[][AES_STATE_COLUMNS_COUNT])
 {
-	// Row 0 is left untouched (row 0 copy could be avoided to gain some speed but it is safer to execute it because Pointer_Output_Buffer count contain everything)
-	Pointer_Output_Buffer[0] = Pointer_Input_Buffer[0];
-	Pointer_Output_Buffer[1] = Pointer_Input_Buffer[1];
-	Pointer_Output_Buffer[2] = Pointer_Input_Buffer[2];
-	Pointer_Output_Buffer[3] = Pointer_Input_Buffer[3];
+	// Row 0 is left untouched (row 0 copy could be avoided to gain some speed but it is safer to execute it because Pointer_Output_State count contain everything)
+	Pointer_Output_State[0][0] = Pointer_Input_State[0][0];
+	Pointer_Output_State[0][1] = Pointer_Input_State[0][1];
+	Pointer_Output_State[0][2] = Pointer_Input_State[0][2];
+	Pointer_Output_State[0][3] = Pointer_Input_State[0][3];
 	
 	// Shift row 1
-	Pointer_Output_Buffer[AES_STATE_COLUMNS_COUNT] = Pointer_Input_Buffer[AES_STATE_COLUMNS_COUNT + 1];
-	Pointer_Output_Buffer[AES_STATE_COLUMNS_COUNT + 1] = Pointer_Input_Buffer[AES_STATE_COLUMNS_COUNT + 2];
-	Pointer_Output_Buffer[AES_STATE_COLUMNS_COUNT + 2] = Pointer_Input_Buffer[AES_STATE_COLUMNS_COUNT + 3];
-	Pointer_Output_Buffer[AES_STATE_COLUMNS_COUNT + 3] = Pointer_Input_Buffer[AES_STATE_COLUMNS_COUNT];
+	Pointer_Output_State[1][0] = Pointer_Input_State[1][1];
+	Pointer_Output_State[1][2] = Pointer_Input_State[1][3];
+	Pointer_Output_State[1][1] = Pointer_Input_State[1][2];
+	Pointer_Output_State[1][3] = Pointer_Input_State[1][0];
 	
 	// Shift row 2
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 2)] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 2) + 2];
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 2) + 1] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 2) + 3];
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 2) + 2] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 2)];
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 2) + 3] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 2) + 1];
+	Pointer_Output_State[2][0] = Pointer_Input_State[2][2];
+	Pointer_Output_State[2][1] = Pointer_Input_State[2][3];
+	Pointer_Output_State[2][2] = Pointer_Input_State[2][0];
+	Pointer_Output_State[2][3] = Pointer_Input_State[2][1];
 	
 	// Shift row 3
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 3)] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 3) + 3];
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 3) + 1] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 3)];
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 3) + 2] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 3) + 1];
-	Pointer_Output_Buffer[(AES_STATE_COLUMNS_COUNT * 3) + 3] = Pointer_Input_Buffer[(AES_STATE_COLUMNS_COUNT * 3) + 2];
+	Pointer_Output_State[3][0] = Pointer_Input_State[3][3];
+	Pointer_Output_State[3][1] = Pointer_Input_State[3][0];
+	Pointer_Output_State[3][2] = Pointer_Input_State[3][1];
+	Pointer_Output_State[3][3] = Pointer_Input_State[3][2];
 }
