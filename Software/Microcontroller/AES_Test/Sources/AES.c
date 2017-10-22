@@ -12,7 +12,7 @@
 /** The AES standard "Nb" parameter. */
 #define AES_STATE_COLUMNS_COUNT 4
 /** The AES standard "Nk" parameter. */
-#define AES_CIPHER_KEY_DOUBLE_WORDS_COUNT 8
+#define AES_CIPHER_KEY_WORDS_COUNT 8
 /** The AES standard "Nr" parameter. */
 #define AES_ROUNDS_COUNT 14
 
@@ -39,6 +39,17 @@ static unsigned char AES_Substitution_Box[16][16] =
 	0xE1, 0xF8, 0x98, 0x11, 0x69, 0xD9, 0x8E, 0x94, 0x9B, 0x1E, 0x87, 0xE9, 0xCE, 0x55, 0x28, 0xDF,
 	0xF8, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
 };
+
+/** AES Rcon array. Only the constants used in AES-256 were kept (see https://en.wikipedia.org/wiki/Rijndael_key_schedule).
+ * @note Values are expanded to 32-bit yet to improve speed.
+ */
+static unsigned long AES_Round_Constants[] =
+{
+	0x8d000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000
+};
+
+/** The key schedule, computed from the provided key. */
+static unsigned long AES_Key_Schedule[AES_STATE_COLUMNS_COUNT * (AES_ROUNDS_COUNT + 1)];
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -117,12 +128,12 @@ static void AESStepMixColumns(unsigned char Pointer_Input_State[][AES_STATE_COLU
 	}
 }
 
-/** Rotate a word bytes according to AES key schedule.
+/** Rotate a word bytes according to AES key expansion.
  * @param Word The word to rotate.
  * @return The rotated word.
  * @note This function is optimized for PIC18 cores that can't shift more than one bit at a time, but can handle two pointers at a time.
  */
-static unsigned long AESKeyScheduleRotateWord(unsigned long Word)
+static unsigned long AESKeyExpansionRotateWord(unsigned long Word)
 {
 	unsigned long Rotated_Word;
 	unsigned char *Pointer_Word_Bytes = (unsigned char *) &Word, *Pointer_Rotated_Word_Bytes = (unsigned char *) &Rotated_Word;
@@ -135,11 +146,11 @@ static unsigned long AESKeyScheduleRotateWord(unsigned long Word)
 	return Rotated_Word;
 }
 
-/** Substitute all word byte values with S-Box ones.
+/** Substitute all word byte values with corresponding S-Box ones.
  * @param Word The word to substitute.
  * @return The substituted word.
  */
-static unsigned long AESKeyScheduleSubstituteWord(unsigned long Word)
+static unsigned long AESKeyExpansionSubstituteWord(unsigned long Word)
 {
 	unsigned long Substituted_Word;
 	unsigned char i, *Pointer_Word_Bytes = (unsigned char *) &Word, *Pointer_Substituted_Word_Bytes = (unsigned char *) &Substituted_Word, Byte, Substitution_Box_Row, Substitution_Box_Column;
@@ -161,4 +172,38 @@ static unsigned long AESKeyScheduleSubstituteWord(unsigned long Word)
 	}
 	
 	return Substituted_Word;
+}
+
+/** Expand the provided 256-bit key.
+ * @param Pointer_AES_Key The 32-byte AES key.
+ * @note This is the specification key expansion algorithm with little improvements because only AES-256 is supported.
+ */
+static void AESKeyExpansion(unsigned char *Pointer_AES_Key)
+{
+	unsigned char i, j, Index_Remainder;
+	unsigned long Temp;
+	
+	// Fill the key schedule first words with the key
+	for (i = 0; i < AES_CIPHER_KEY_WORDS_COUNT; i++)
+	{
+		// Convert 4 bytes into a word (loop is manually unrolled to make sure to save execution time)
+		AES_Key_Schedule[i] = Pointer_AES_Key[0];
+		AES_Key_Schedule[i] = (AES_Key_Schedule[i] << 8) | Pointer_AES_Key[1];
+		AES_Key_Schedule[i] = (AES_Key_Schedule[i] << 8) | Pointer_AES_Key[2];
+		AES_Key_Schedule[i] = (AES_Key_Schedule[i] << 8) | Pointer_AES_Key[3];
+		Pointer_AES_Key += 4;
+	}
+	
+	// Expand the key to generate all remaining needed values
+	for (i = AES_CIPHER_KEY_WORDS_COUNT; i < AES_STATE_COLUMNS_COUNT * (AES_ROUNDS_COUNT + 1); i++)
+	{
+		Temp = AES_Key_Schedule[i - 1];
+		
+		// Cache modulo operation result as it is slow to compute
+		Index_Remainder = i % AES_CIPHER_KEY_WORDS_COUNT;
+		if (Index_Remainder == 0) Temp = AESKeyExpansionSubstituteWord(AESKeyExpansionRotateWord(Temp)) ^ AES_Round_Constants[i / AES_CIPHER_KEY_WORDS_COUNT];
+		else if (Index_Remainder == 4) Temp = AESKeyExpansionSubstituteWord(Temp);
+		
+		AES_Key_Schedule[i] = AES_Key_Schedule[i - AES_CIPHER_KEY_WORDS_COUNT] ^ Temp;
+	}
 }
