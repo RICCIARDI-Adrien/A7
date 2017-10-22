@@ -116,3 +116,49 @@ static void AESStepMixColumns(unsigned char Pointer_Input_State[][AES_STATE_COLU
 		Pointer_Output_State[3][i] = (3 * Pointer_Input_State[0][i]) ^ Pointer_Input_State[1][i] ^ Pointer_Input_State[2][i] ^ (2 * Pointer_Input_State[3][i]);
 	}
 }
+
+/** Rotate a word bytes according to AES key schedule.
+ * @param Word The word to rotate.
+ * @return The rotated word.
+ * @note This function is optimized for PIC18 cores that can't shift more than one bit at a time, but can handle two pointers at a time.
+ */
+static unsigned long AESKeyScheduleRotateWord(unsigned long Word)
+{
+	unsigned long Rotated_Word;
+	unsigned char *Pointer_Word_Bytes = (unsigned char *) &Word, *Pointer_Rotated_Word_Bytes = (unsigned char *) &Rotated_Word;
+	
+	Pointer_Rotated_Word_Bytes[0] = Pointer_Word_Bytes[3];
+	Pointer_Rotated_Word_Bytes[1] = Pointer_Word_Bytes[0];
+	Pointer_Rotated_Word_Bytes[2] = Pointer_Word_Bytes[1];
+	Pointer_Rotated_Word_Bytes[3] = Pointer_Word_Bytes[2];
+	
+	return Rotated_Word;
+}
+
+/** Substitute all word byte values with S-Box ones.
+ * @param Word The word to substitute.
+ * @return The substituted word.
+ */
+static unsigned long AESKeyScheduleSubstituteWord(unsigned long Word)
+{
+	unsigned long Substituted_Word;
+	unsigned char i, *Pointer_Word_Bytes = (unsigned char *) &Word, *Pointer_Substituted_Word_Bytes = (unsigned char *) &Substituted_Word, Byte, Substitution_Box_Row, Substitution_Box_Column;
+	
+	for (i = 0; i < 4; i++)
+	{
+		// Cache word next byte
+		Byte = *Pointer_Word_Bytes;
+		
+		// Extract S-Box coordinates
+		Substitution_Box_Row = Byte >> 4;
+		Substitution_Box_Column = Byte & 0x0F;
+		
+		// Substitute the byte
+		*Pointer_Substituted_Word_Bytes = AES_Substitution_Box[Substitution_Box_Row][Substitution_Box_Column];
+		
+		Pointer_Word_Bytes++;
+		Pointer_Substituted_Word_Bytes++;
+	}
+	
+	return Substituted_Word;
+}
