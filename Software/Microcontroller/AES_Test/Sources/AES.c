@@ -133,7 +133,7 @@ static void AESStepMixColumns(unsigned char Pointer_Input_State[][AES_STATE_COLU
  * @return The rotated word.
  * @note This function is optimized for PIC18 cores that can't shift more than one bit at a time, but can handle two pointers at a time.
  */
-static unsigned long AESKeyExpansionRotateWord(unsigned long Word)
+static inline unsigned long AESKeyExpansionRotateWord(unsigned long Word)
 {
 	unsigned long Rotated_Word;
 	unsigned char *Pointer_Word_Bytes = (unsigned char *) &Word, *Pointer_Rotated_Word_Bytes = (unsigned char *) &Rotated_Word;
@@ -150,7 +150,7 @@ static unsigned long AESKeyExpansionRotateWord(unsigned long Word)
  * @param Word The word to substitute.
  * @return The substituted word.
  */
-static unsigned long AESKeyExpansionSubstituteWord(unsigned long Word)
+static inline unsigned long AESKeyExpansionSubstituteWord(unsigned long Word)
 {
 	unsigned long Substituted_Word;
 	unsigned char i, *Pointer_Word_Bytes = (unsigned char *) &Word, *Pointer_Substituted_Word_Bytes = (unsigned char *) &Substituted_Word, Byte, Substitution_Box_Row, Substitution_Box_Column;
@@ -178,7 +178,7 @@ static unsigned long AESKeyExpansionSubstituteWord(unsigned long Word)
  * @param Pointer_AES_Key The 32-byte AES key.
  * @note This is the specification key expansion algorithm with little improvements because only AES-256 is supported.
  */
-static void AESKeyExpansion(unsigned char *Pointer_AES_Key)
+static inline void AESKeyExpansion(unsigned char *Pointer_AES_Key)
 {
 	unsigned char i, j, Index_Remainder;
 	unsigned long Temp;
@@ -206,4 +206,31 @@ static void AESKeyExpansion(unsigned char *Pointer_AES_Key)
 		
 		AES_Key_Schedule[i] = AES_Key_Schedule[i - AES_CIPHER_KEY_WORDS_COUNT] ^ Temp;
 	}
+}
+
+static void AESStepAddRoundKey(unsigned char First_Key_Schedule_Index, unsigned char Pointer_Input_State[][AES_STATE_COLUMNS_COUNT], unsigned char Pointer_Output_State[][AES_STATE_COLUMNS_COUNT])
+{
+	unsigned char *Pointer_Key_Schedule_Bytes, i;
+	
+	for (i = 0; i < AES_STATE_COLUMNS_COUNT; i++)
+	{
+		// Get byte access to the next key schedule
+		Pointer_Key_Schedule_Bytes = (unsigned char *) &AES_Key_Schedule[First_Key_Schedule_Index];
+		First_Key_Schedule_Index++;
+		
+		// Do the XOR operation on the current column (don't forget that 32-bit key schedule are stored in little endian order)
+		Pointer_Output_State[0][i] = Pointer_Input_State[0][i] ^ Pointer_Key_Schedule_Bytes[3];
+		Pointer_Output_State[1][i] = Pointer_Input_State[1][i] ^ Pointer_Key_Schedule_Bytes[2];
+		Pointer_Output_State[2][i] = Pointer_Input_State[2][i] ^ Pointer_Key_Schedule_Bytes[1];
+		Pointer_Output_State[3][i] = Pointer_Input_State[3][i] ^ Pointer_Key_Schedule_Bytes[0];
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
+// Public functions
+//-------------------------------------------------------------------------------------------------
+void AES256CTRInitialize(unsigned char *Pointer_Key)
+{
+	// Compute key schedule
+	AESKeyExpansion(Pointer_Key);
 }
