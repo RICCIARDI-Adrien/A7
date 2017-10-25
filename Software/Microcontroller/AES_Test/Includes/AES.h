@@ -11,6 +11,9 @@
 /** An AES block size in bytes. */
 #define AES_BLOCK_SIZE 16
 
+/** AES-256 key size in bytes. */
+#define AES_256_KEY_SIZE 32
+
 //-------------------------------------------------------------------------------------------------
 // Functions
 //-------------------------------------------------------------------------------------------------
@@ -25,6 +28,6 @@ void AES256CTRInitialize(unsigned char *Pointer_Key);
  * @param Pointer_Output_Buffer On output, contain the processed data (buffer must be be AES_BLOCK_SIZE bytes long).
  * @warning AES256CTRInitialize() must have been called once before using this function, or the result will be unpredictable.
  */
-void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, *Pointer_Output_Buffer);
+void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer_Output_Buffer);
 
 #endif

@@ -3,6 +3,7 @@
  * @author Adrien RICCIARDI
  */
 #include <AES.h>
+#include <string.h>
 
 //-------------------------------------------------------------------------------------------------
 // Private constants
@@ -233,4 +234,39 @@ void AES256CTRInitialize(unsigned char *Pointer_Key)
 {
 	// Compute key schedule
 	AESKeyExpansion(Pointer_Key);
+}
+
+void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer_Output_Buffer)
+{
+	unsigned char (*Pointer_Buffer_1)[AES_STATE_COLUMNS_COUNT], (*Pointer_Buffer_2)[AES_STATE_COLUMNS_COUNT], Row, Column, i;
+	
+	Pointer_Buffer_1 = (unsigned char (*)[AES_STATE_COLUMNS_COUNT]) Pointer_Input_Buffer;
+	Pointer_Buffer_2 = (unsigned char (*)[AES_STATE_COLUMNS_COUNT]) Pointer_Output_Buffer;
+	
+	// Reorganize input data in columns
+	i = 0;
+	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
+	{
+		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
+		{
+			Pointer_Buffer_2[Row][Column] = Pointer_Input_Buffer[i];
+			i++; // Use an index to avoid modifying the pointer value
+		}
+	}
+	
+	AESStepAddRoundKey(0, Pointer_Buffer_2, Pointer_Buffer_1);
+	
+	AESStepSubstituteBytes(Pointer_Buffer_1, Pointer_Buffer_2);
+	
+	// TEST
+	i = 0;
+	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
+	{
+		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
+		{
+			Pointer_Buffer_1[Row][Column] = Pointer_Output_Buffer[i];
+			i++;
+		}
+	}
+	memcpy(Pointer_Buffer_2, Pointer_Buffer_1, 16);
 }
