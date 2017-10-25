@@ -25,7 +25,7 @@ void main(void)
 	
 	// Initialize operation
 	AES256CTRInitialize(Key); // TODO cipher and decipher support
-	SystemDisplayRenderTextString("Initialized AES\nengine.\n");
+	SystemDisplayRenderTextString("Initialized engine.\n");
 	SystemDisplayRenderFrameBuffer();
 	
 	while (1)
@@ -37,7 +37,7 @@ void main(void)
 		
 		// Process it
 		AES256CTRUpdate(Input_Buffer, Output_Buffer);
-		SystemDisplayRenderTextString("FUCK.\n");
+		SystemDisplayRenderTextString("Processed data.\n");
 		SystemDisplayRenderFrameBuffer();
 		
 		// Send the processed data back

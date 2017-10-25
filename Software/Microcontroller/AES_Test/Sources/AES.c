@@ -38,7 +38,7 @@ static unsigned char AES_Substitution_Box[16][16] =
 	0xBA, 0x78, 0x25, 0x2E, 0x1C, 0xA6, 0xB4, 0xC6, 0xE8, 0xDD, 0x74, 0x1F, 0x4B, 0xBD, 0x8B, 0x8A,
 	0x70, 0x3E, 0xB5, 0x66, 0x48, 0x03, 0xF6, 0x0E, 0x61, 0x35, 0x57, 0xB9, 0x86, 0xC1, 0x1D, 0x9E,
 	0xE1, 0xF8, 0x98, 0x11, 0x69, 0xD9, 0x8E, 0x94, 0x9B, 0x1E, 0x87, 0xE9, 0xCE, 0x55, 0x28, 0xDF,
-	0xF8, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
+	0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
 };
 
 /** AES Rcon array. Only the constants used in AES-256 were kept (see https://en.wikipedia.org/wiki/Rijndael_key_schedule).
@@ -94,8 +94,8 @@ static void AESStepShiftRows(unsigned char Pointer_Input_State[][AES_STATE_COLUM
 	
 	// Shift row 1
 	Pointer_Output_State[1][0] = Pointer_Input_State[1][1];
-	Pointer_Output_State[1][2] = Pointer_Input_State[1][3];
 	Pointer_Output_State[1][1] = Pointer_Input_State[1][2];
+	Pointer_Output_State[1][2] = Pointer_Input_State[1][3];
 	Pointer_Output_State[1][3] = Pointer_Input_State[1][0];
 	
 	// Shift row 2
@@ -111,6 +111,31 @@ static void AESStepShiftRows(unsigned char Pointer_Input_State[][AES_STATE_COLUM
 	Pointer_Output_State[3][3] = Pointer_Input_State[3][2];
 }
 
+/** Multiply the provided value by 2 in Rijndael's Galois field.
+ * @param Value The value to multiply.
+ * @return The multiplied value.
+ */
+static inline unsigned char AESMixColumnMultiplyByTwo(unsigned char Value)
+{
+	unsigned char Shifted_Value;
+	
+	// Following magic comes from http://www.angelfire.com/biz7/atleast/mix_columns.pdf.
+	Shifted_Value = Value << 1;
+	if (Value & 0x80) Shifted_Value ^= 0x1B;
+	
+	return Shifted_Value;
+}
+
+/** Multiply the provided value by 3 in Rijndael's Galois field.
+ * @param Value The value to multiply.
+ * @return The multiplied value.
+ */
+static inline unsigned char AESMixColumnMultiplyByThree(unsigned char Value)
+{
+	// Following magic comes from https://crypto.stackexchange.com/questions/2402/how-to-solve-mixcolumns.
+	return AESMixColumnMultiplyByTwo(Value) ^ Value;
+}
+
 /** Execute the MixColumns() AES step.
  * @param Pointer_Input_State The state to mix columns.
  * @param Pointer_Output_State On output, contains mixed columns state.
@@ -122,10 +147,10 @@ static void AESStepMixColumns(unsigned char Pointer_Input_State[][AES_STATE_COLU
 	for (i = 0; i < AES_STATE_COLUMNS_COUNT; i++)
 	{
 		// Compute column values
-		Pointer_Output_State[0][i] = (2 * Pointer_Input_State[0][i]) ^ (3 * Pointer_Input_State[1][i]) ^ Pointer_Input_State[2][i] ^ Pointer_Input_State[3][i];
-		Pointer_Output_State[1][i] = Pointer_Input_State[0][i] ^ (2 * Pointer_Input_State[1][i]) ^ (3 * Pointer_Input_State[2][i]) ^ Pointer_Input_State[3][i];
-		Pointer_Output_State[2][i] = Pointer_Input_State[0][i] ^ Pointer_Input_State[1][i] ^ (2 * Pointer_Input_State[2][i]) ^ (3 * Pointer_Input_State[3][i]);
-		Pointer_Output_State[3][i] = (3 * Pointer_Input_State[0][i]) ^ Pointer_Input_State[1][i] ^ Pointer_Input_State[2][i] ^ (2 * Pointer_Input_State[3][i]);
+		Pointer_Output_State[0][i] = AESMixColumnMultiplyByTwo(Pointer_Input_State[0][i]) ^ AESMixColumnMultiplyByThree(Pointer_Input_State[1][i]) ^ Pointer_Input_State[2][i] ^ Pointer_Input_State[3][i];
+		Pointer_Output_State[1][i] = Pointer_Input_State[0][i] ^ AESMixColumnMultiplyByTwo(Pointer_Input_State[1][i]) ^ AESMixColumnMultiplyByThree(Pointer_Input_State[2][i]) ^ Pointer_Input_State[3][i];
+		Pointer_Output_State[2][i] = Pointer_Input_State[0][i] ^ Pointer_Input_State[1][i] ^ AESMixColumnMultiplyByTwo(Pointer_Input_State[2][i]) ^ AESMixColumnMultiplyByThree(Pointer_Input_State[3][i]);
+		Pointer_Output_State[3][i] = AESMixColumnMultiplyByThree(Pointer_Input_State[0][i]) ^ Pointer_Input_State[1][i] ^ Pointer_Input_State[2][i] ^ AESMixColumnMultiplyByTwo(Pointer_Input_State[3][i]);
 	}
 }
 
@@ -257,8 +282,11 @@ void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer
 	AESStepAddRoundKey(0, Pointer_Buffer_2, Pointer_Buffer_1);
 	
 	AESStepSubstituteBytes(Pointer_Buffer_1, Pointer_Buffer_2);
+	AESStepShiftRows(Pointer_Buffer_2, Pointer_Buffer_1);
+	AESStepMixColumns(Pointer_Buffer_1, Pointer_Buffer_2);
 	
 	// TEST
+#if 1
 	i = 0;
 	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
 	{
@@ -269,4 +297,15 @@ void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer
 		}
 	}
 	memcpy(Pointer_Buffer_2, Pointer_Buffer_1, 16);
+#else
+	i = 0;
+	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
+	{
+		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
+		{
+			Pointer_Buffer_2[Row][Column] = Pointer_Input_Buffer[i];
+			i++;
+		}
+	}
+#endif
 }
