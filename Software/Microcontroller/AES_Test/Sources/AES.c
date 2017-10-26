@@ -269,43 +269,40 @@ void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer
 	Pointer_Buffer_2 = (unsigned char (*)[AES_STATE_COLUMNS_COUNT]) Pointer_Output_Buffer;
 	
 	// Reorganize input data in columns
-	i = 0;
 	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
 	{
 		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
 		{
-			Pointer_Buffer_2[Row][Column] = Pointer_Input_Buffer[i];
-			i++; // Use an index to avoid modifying the pointer value
+			Pointer_Buffer_2[Row][Column] = *Pointer_Input_Buffer;
+			Pointer_Input_Buffer++;
 		}
 	}
 	
+	// Initial key schedule
 	AESStepAddRoundKey(0, Pointer_Buffer_2, Pointer_Buffer_1);
 	
+	// Execute all rounds but least one
+	for (i = 1; i < AES_ROUNDS_COUNT; i++)
+	{
+		AESStepSubstituteBytes(Pointer_Buffer_1, Pointer_Buffer_2);
+		AESStepShiftRows(Pointer_Buffer_2, Pointer_Buffer_1);
+		AESStepMixColumns(Pointer_Buffer_1, Pointer_Buffer_2);
+		AESStepAddRoundKey(i * AES_STATE_COLUMNS_COUNT, Pointer_Buffer_2, Pointer_Buffer_1);
+	}
+	
+	// Special last round
 	AESStepSubstituteBytes(Pointer_Buffer_1, Pointer_Buffer_2);
 	AESStepShiftRows(Pointer_Buffer_2, Pointer_Buffer_1);
-	AESStepMixColumns(Pointer_Buffer_1, Pointer_Buffer_2);
+	AESStepAddRoundKey(AES_ROUNDS_COUNT * AES_STATE_COLUMNS_COUNT, Pointer_Buffer_1, Pointer_Buffer_2);
 	
-	// TEST
-#if 1
-	i = 0;
+	// Reorganize output data in columns
 	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
 	{
 		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
 		{
-			Pointer_Buffer_1[Row][Column] = Pointer_Output_Buffer[i];
-			i++;
+			Pointer_Buffer_1[Row][Column] = *Pointer_Output_Buffer;
+			Pointer_Output_Buffer++;
 		}
 	}
-	memcpy(Pointer_Buffer_2, Pointer_Buffer_1, 16);
-#else
-	i = 0;
-	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
-	{
-		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
-		{
-			Pointer_Buffer_2[Row][Column] = Pointer_Input_Buffer[i];
-			i++;
-		}
-	}
-#endif
+	memcpy(Pointer_Buffer_2, Pointer_Buffer_1, AES_BLOCK_SIZE);
 }
