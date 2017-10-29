@@ -331,15 +331,19 @@ void AES256CBCInitialize(unsigned char *Pointer_Key)
 
 void AES256CBCUpdate(unsigned char *Pointer_Buffer)
 {
-	unsigned char (*Pointer_Buffer_1)[AES_STATE_COLUMNS_COUNT], *Pointer_Internal_Block_Buffer, i, Row, Column;
+	unsigned char (*Pointer_Buffer_1)[AES_STATE_COLUMNS_COUNT], *Pointer_Internal_Block_Buffer, i, Row, Column, *Pointer_Buffer_Bytes, *Pointer_Internal_Block_Buffer_Bytes;
 	
 	Pointer_Buffer_1 = (unsigned char (*)[AES_STATE_COLUMNS_COUNT]) Pointer_Buffer;
 	Pointer_Internal_Block_Buffer = (unsigned char *) AES_Internal_Block_Buffer;
 	
-	// XOR input data with previous block data
-	for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
+	// XOR input data with previous block data (using 1-dimension pointers instead of 2-dimension ones makes the code faster about 1.5% when compiling in free mode)
+	Pointer_Buffer_Bytes = (unsigned char *) Pointer_Buffer;
+	Pointer_Internal_Block_Buffer_Bytes = (unsigned char *) AES_Internal_Block_Buffer;
+	for (i = 0; i < AES_BLOCK_SIZE; i++)
 	{
-		for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++) Pointer_Buffer_1[Row][Column] ^= AES_Internal_Block_Buffer[Row][Column];
+		*Pointer_Buffer_Bytes ^= *Pointer_Internal_Block_Buffer_Bytes;
+		Pointer_Buffer_Bytes++;
+		Pointer_Internal_Block_Buffer_Bytes++;
 	}
 	
 	// Reorganize input data in columns
