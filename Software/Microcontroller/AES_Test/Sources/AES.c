@@ -4,6 +4,7 @@
  */
 #include <AES.h>
 #include <string.h>
+#include <System.h>
 
 //-------------------------------------------------------------------------------------------------
 // Private constants
@@ -51,6 +52,9 @@ static unsigned long AES_Round_Constants[] =
 
 /** The key schedule, computed from the provided key. */
 static unsigned long AES_Key_Schedule[AES_STATE_COLUMNS_COUNT * (AES_ROUNDS_COUNT + 1)];
+
+/** This buffer is used by cipher and decipher functions to share data between successive update() function calls. */
+static unsigned char AES_Internal_Block_Buffer[AES_STATE_ROWS_COUNT][AES_STATE_COLUMNS_COUNT];
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -309,22 +313,29 @@ void AES256CTRUpdate(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer
 
 void AES256CBCInitialize(unsigned char *Pointer_Key)
 {
+	unsigned char Row, Column;
+	
 	// Compute key schedule
 	AESKeyExpansion(Pointer_Key);
+	
+	// Generate a random data block to use as the initial chaining seed (this way there is no need to provide an initialization vector)
+	for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
+	{
+		for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++) AES_Internal_Block_Buffer[Row][Column] = SystemRandomGetNumber();
+	}
 }
 
 void AES256CBCUpdate(unsigned char *Pointer_Buffer)
 {
-	static unsigned char Buffer_2[AES_STATE_ROWS_COUNT][AES_STATE_COLUMNS_COUNT] = {0};
-	unsigned char (*Pointer_Buffer_1)[AES_STATE_COLUMNS_COUNT], *Pointer_Buffer_2, i, Row, Column;
+	unsigned char (*Pointer_Buffer_1)[AES_STATE_COLUMNS_COUNT], *Pointer_Internal_Block_Buffer, i, Row, Column;
 	
 	Pointer_Buffer_1 = (unsigned char (*)[AES_STATE_COLUMNS_COUNT]) Pointer_Buffer;
-	Pointer_Buffer_2 = (unsigned char *) Buffer_2;
+	Pointer_Internal_Block_Buffer = (unsigned char *) AES_Internal_Block_Buffer;
 	
 	// XOR input data with previous block data
 	for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
 	{
-		for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++) Pointer_Buffer_1[Row][Column] ^= Buffer_2[Row][Column];
+		for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++) Pointer_Buffer_1[Row][Column] ^= AES_Internal_Block_Buffer[Row][Column];
 	}
 	
 	// Reorganize input data in columns
@@ -332,38 +343,38 @@ void AES256CBCUpdate(unsigned char *Pointer_Buffer)
 	{
 		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
 		{
-			Buffer_2[Row][Column] = *Pointer_Buffer;
+			AES_Internal_Block_Buffer[Row][Column] = *Pointer_Buffer;
 			Pointer_Buffer++;
 		}
 	}
 	
 	// Initial key schedule
-	AESStepAddRoundKey(0, Buffer_2, Pointer_Buffer_1);
+	AESStepAddRoundKey(0, AES_Internal_Block_Buffer, Pointer_Buffer_1);
 	
 	// Execute all rounds but least one
 	for (i = 1; i < AES_ROUNDS_COUNT; i++)
 	{
-		AESStepSubstituteBytes(Pointer_Buffer_1, Buffer_2);
-		AESStepShiftRows(Buffer_2, Pointer_Buffer_1);
-		AESStepMixColumns(Pointer_Buffer_1, Buffer_2);
-		AESStepAddRoundKey(i * AES_STATE_COLUMNS_COUNT, Buffer_2, Pointer_Buffer_1);
+		AESStepSubstituteBytes(Pointer_Buffer_1, AES_Internal_Block_Buffer);
+		AESStepShiftRows(AES_Internal_Block_Buffer, Pointer_Buffer_1);
+		AESStepMixColumns(Pointer_Buffer_1, AES_Internal_Block_Buffer);
+		AESStepAddRoundKey(i * AES_STATE_COLUMNS_COUNT, AES_Internal_Block_Buffer, Pointer_Buffer_1);
 	}
 	
 	// Special last round
-	AESStepSubstituteBytes(Pointer_Buffer_1, Buffer_2);
-	AESStepShiftRows(Buffer_2, Pointer_Buffer_1);
-	AESStepAddRoundKey(AES_ROUNDS_COUNT * AES_STATE_COLUMNS_COUNT, Pointer_Buffer_1, Buffer_2);
+	AESStepSubstituteBytes(Pointer_Buffer_1, AES_Internal_Block_Buffer);
+	AESStepShiftRows(AES_Internal_Block_Buffer, Pointer_Buffer_1);
+	AESStepAddRoundKey(AES_ROUNDS_COUNT * AES_STATE_COLUMNS_COUNT, Pointer_Buffer_1, AES_Internal_Block_Buffer);
 	
 	// Reorganize output data in columns
 	for (Column = 0; Column < AES_STATE_COLUMNS_COUNT; Column++)
 	{
 		for (Row = 0; Row < AES_STATE_ROWS_COUNT; Row++)
 		{
-			Pointer_Buffer_1[Row][Column] = *Pointer_Buffer_2;
-			Pointer_Buffer_2++;
+			Pointer_Buffer_1[Row][Column] = *Pointer_Internal_Block_Buffer;
+			Pointer_Internal_Block_Buffer++;
 		}
 	}
 	
 	// Keep encrypted block in the internal buffer to allow XORing it with the next block
-	memcpy(Buffer_2, Pointer_Buffer_1, AES_BLOCK_SIZE);
+	memcpy(AES_Internal_Block_Buffer, Pointer_Buffer_1, AES_BLOCK_SIZE);
 }

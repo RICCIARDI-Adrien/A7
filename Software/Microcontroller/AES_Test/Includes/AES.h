@@ -39,7 +39,7 @@ void AES256CBCInitialize(unsigned char *Pointer_Key);
 /** Cipher or decipher data using Cipher Block Chaining mode.
  * @param Pointer_Buffer The data to process (buffer must be AES_BLOCK_SIZE bytes long). On output, contain the processed data.
  * @warning AES256CBCInitialize() must have been called once before using this function, or the result will be unpredictable.
- * @note Call this function with an initial random block (not the data to cipher), so there is no need to keep an initialization vector.
+ * @note Provide a dummy initial block because it will be used only to generate the chaining "seed", it's data will be lost.
  */
 void AES256CBCUpdate(unsigned char *Pointer_Buffer);
 
