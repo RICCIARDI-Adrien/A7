@@ -10,7 +10,7 @@
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	unsigned char Input_Buffer[AES_BLOCK_SIZE], Output_Buffer[AES_BLOCK_SIZE], i, Key[AES_256_KEY_SIZE];
+	unsigned char Buffer[AES_BLOCK_SIZE], i, Key[AES_256_KEY_SIZE];
 	
 	SystemInitialize();
 	
@@ -21,27 +21,21 @@ void main(void)
 	SystemDisplayRenderTextString("Received key.\n");
 	SystemDisplayRenderFrameBuffer();
 	
-	// Receive initialization vector (TODO remove if CTR only ?)
-	
 	// Initialize operation
-	AES256CTRInitialize(Key); // TODO cipher and decipher support
+	AES256CBCInitialize(Key); // TODO cipher and decipher support
 	SystemDisplayRenderTextString("Initialized engine.\n");
 	SystemDisplayRenderFrameBuffer();
 	
 	while (1)
 	{
 		// Receive a chunk of data from the UART
-		for (i = 0; i < AES_BLOCK_SIZE; i++) Input_Buffer[i] = SystemSerialPortReadByte();
-		SystemDisplayRenderTextString("Received data.\n");
-		SystemDisplayRenderFrameBuffer();
+		for (i = 0; i < AES_BLOCK_SIZE; i++) Buffer[i] = SystemSerialPortReadByte();
 		
 		// Process it
-		AES256CTRUpdate(Input_Buffer, Output_Buffer);
-		SystemDisplayRenderTextString("Processed data.\n");
-		SystemDisplayRenderFrameBuffer();
+		AES256CBCUpdate(Buffer);
 		
 		// Send the processed data back
-		for (i = 0; i < AES_BLOCK_SIZE; i++) SystemSerialPortWriteByte(Output_Buffer[i]);
+		for (i = 0; i < AES_BLOCK_SIZE; i++) SystemSerialPortWriteByte(Buffer[i]);
 		
 		// Update display
 		
