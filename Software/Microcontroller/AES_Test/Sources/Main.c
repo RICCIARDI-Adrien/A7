@@ -32,12 +32,11 @@ void main(void)
 		for (i = 0; i < AES_BLOCK_SIZE; i++) Buffer[i] = SystemSerialPortReadByte();
 		
 		// Process it
+		SystemLedOn();
 		AES256CBCUpdate(Buffer);
+		SystemLedOff();
 		
 		// Send the processed data back
 		for (i = 0; i < AES_BLOCK_SIZE; i++) SystemSerialPortWriteByte(Buffer[i]);
-		
-		// Update display
-		
 	}
 }
