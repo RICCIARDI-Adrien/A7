@@ -60,27 +60,31 @@ static unsigned char AES_Internal_Block_Buffer[AES_STATE_ROWS_COUNT][AES_STATE_C
 // Private functions
 //-------------------------------------------------------------------------------------------------
 /** Substitute bytes from the input buffer using the S-box. This is the SubBytes() step of the specification.
- * @param Pointer_Input_Buffer The data to substitute. TODO state
- * @param Pointer_Output_Buffer On output, contain the substituted data. TODO state
+ * @param Pointer_Input_Buffer The data to substitute.
+ * @param Pointer_Output_Buffer On output, contain the substituted data.
  */
-static void AESStepSubstituteBytes(unsigned char *Pointer_Input_Buffer, unsigned char *Pointer_Output_Buffer)
+static void AESStepSubstituteBytes(unsigned char Pointer_Input_Buffer[][AES_STATE_COLUMNS_COUNT], unsigned char Pointer_Output_Buffer[][AES_STATE_COLUMNS_COUNT])
 {
-	unsigned char Substitution_Box_Row, Substitution_Box_Column, i, Byte;
+	unsigned char Substitution_Box_Row, Substitution_Box_Column, i, Byte, *Pointer_Input_Buffer_Bytes, *Pointer_Output_Buffer_Bytes;
+	
+	// One-dimension arrays allow a faster and simpler code in this case
+	Pointer_Input_Buffer_Bytes = (unsigned char *) Pointer_Input_Buffer;
+	Pointer_Output_Buffer_Bytes = (unsigned char *) Pointer_Output_Buffer;
 	
 	for (i = 0; i < AES_STATE_ROWS_COUNT * AES_STATE_COLUMNS_COUNT; i++)
 	{
 		// Cache input byte value
-		Byte = *Pointer_Input_Buffer;
+		Byte = *Pointer_Input_Buffer_Bytes;
 		
 		// Extract S-Box coordinates
 		Substitution_Box_Row = Byte >> 4;
 		Substitution_Box_Column = Byte & 0x0F;
 		
 		// Substitute the byte
-		*Pointer_Output_Buffer = AES_Substitution_Box[Substitution_Box_Row][Substitution_Box_Column];
+		*Pointer_Output_Buffer_Bytes = AES_Substitution_Box[Substitution_Box_Row][Substitution_Box_Column];
 		
-		Pointer_Input_Buffer++;
-		Pointer_Output_Buffer++;
+		Pointer_Input_Buffer_Bytes++;
+		Pointer_Output_Buffer_Bytes++;
 	}
 }
 
