@@ -24,6 +24,8 @@ $(1): System
 	cd $(1) && $$(MAKE)
 
 $(1)-clean:
+	@# Automatically remove the objects directory
+	@rm -rf $(1)/$(MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS)
 	cd $(1) && $$(MAKE) clean
 
 $(1)-download: $(1)
