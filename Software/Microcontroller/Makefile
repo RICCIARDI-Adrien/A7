@@ -2,6 +2,10 @@
 export MAIN_MAKEFILE_PATH_BINARIES = ../../Binaries
 export MAIN_MAKEFILE_C_COMPILER = xc8
 export MAIN_MAKEFILE_C_COMPILER_FLAGS = --chip=18F26K22 -I../System/Includes -I$(XC8_INCLUDES_PATH) $(MAIN_MAKEFILE_PATH_BINARIES)/System.lpp --codeoffset=0x2000
+# Following paths can be used only from the application itself
+export MAIN_MAKEFILE_APPLICATION_PATH_INCLUDES = Includes
+export MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS = Objects
+export MAIN_MAKEFILE_APPLICATION_PATH_SOURCES = Sources
 
 # Find all directories (each application stands in a separate directory). Search only in the current directory (do not go into subdirectories), display only the file name with leading "./" removed, ignore "." file
 DIRECTORIES_LIST = $(sort $(shell find . -mindepth 1 -maxdepth 1 -type d -printf "%f "))
@@ -16,7 +20,7 @@ APPLICATIONS_LIST = $(filter-out Programs_Manager System,$(DIRECTORIES_LIST))
 define CREATE_APPLICATION_RULES =
 $(1): System
 	@# Make sure objects directory is present
-	@mkdir -p $(1)/Objects
+	@mkdir -p $(1)/$(MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS)
 	cd $(1) && $$(MAKE)
 
 $(1)-clean:
