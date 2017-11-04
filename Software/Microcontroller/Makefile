@@ -33,13 +33,13 @@ $(1)-download: $(1)
 	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex $(shell cat $(1)/Application_Name_On_A7.txt)
 endef
 
-# Compile all applications (there is no need to explicitly depend on System because all applications depend on it yet)
-all: $(APPLICATIONS_LIST)
-	@printf "\033[32mAll applications successfully built.\033[0m\n"
+# Compile everything (there is no need to explicitly depend on System because all applications depend on it yet)
+all: $(APPLICATIONS_LIST) Programs_Manager
+	@printf "\033[32mSystem and all applications successfully built.\033[0m\n"
 
-# Clean all applications and System too
-clean:
-	echo "TODO"
+# Clean everything (it works by modifying all words from the applications list to append "-clean" at their end)
+clean: $(APPLICATIONS_LIST:=-clean) Programs_Manager-clean System-clean
+	@printf "\033[32mSystem and all applications successfully cleaned.\033[0m\n"
 
 # System and Programs Manager need specific rules because they can't be downloaded and System build is slightly different
 # Programs Manager must be explicitly compiled, it is not automatically compiled when executing "all" rule
