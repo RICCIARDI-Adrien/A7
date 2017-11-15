@@ -417,7 +417,7 @@ void SystemDisplayRenderTextCharacter(unsigned char Character)
 			System_Display_Text_Cursor_X--;
 			
 			// Write a "space" character at the last line character location TODO use a real rendering function if the text is not aligned on a display byte
-			Current_Row_Index = (System_Display_Text_Cursor_Y * (SYSTEM_DISPLAY_WIDTH / SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH)) + (System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH); // Recycle Current_Row_Index variable
+			Current_Row_Index = (System_Display_Text_Cursor_Y * SYSTEM_DISPLAY_WIDTH) + (System_Display_Text_Cursor_X * SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH); // Recycle Current_Row_Index variable
 			for (i = 0; i < SYSTEM_DISPLAY_TEXT_CHARACTER_WIDTH; i++)
 			{
 				System_Display_Frame_Buffer[Current_Row_Index] = 0;
