@@ -56,8 +56,9 @@ void SystemInitialize(void)
 
 void SystemInitializeProgramsManager(void)
 {
-	// Start timer 4 before everything else to make it count with a non-stable input clock, so the timer value is random
-	T4CON = 0x04; // Enable the timer with a 1:1 prescaler and 1:1 postscaler
+	// Start timers before everything else to make them count with a non-stable input clock, so the timer values are random
+	T4CON = 0x04; // Start a fast timer (set a 1:1 prescaler and 1:1 postscaler)
+	T0CON = 0xC7; // Start a slow timer (enable timer, configure it as 8 bits, use Fosc/4 as clock source, set a 1:256 prescaler)
 	
 	// Set oscillator frequency to 64MHz
 	OSCCON = 0x78; // Core enters sleep mode when issuing a SLEEP instruction, select 16MHz frequency for high frequency internal oscillator, device is running from primary clock (set as "internal oscillator" in configuration registers)

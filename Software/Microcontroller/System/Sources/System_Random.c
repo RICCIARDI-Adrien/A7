@@ -15,13 +15,23 @@ static unsigned char System_Random_Seed;
 // Public functions
 //--------------------------------------------------------------------------------------------------
 void SystemRandomInitialize(void)
-{	
-	// Seed the random numbers generator with a random value (timer 4 started counting before the main oscillator was stable, so it's value is hard to predict)
-	System_Random_Seed = TMR4;
+{
+	// Seed the random numbers generator with a random value (timers started counting before the main oscillator was stable, so their values are hard to predict)
+	System_Random_Seed = TMR4 ^ TMR0;
 }
 
 unsigned char SystemRandomGetNumber(void)
 {
-	System_Random_Seed = (((System_Random_Seed << 1) + System_Random_Seed) - 7) ^ TMR4; // New_Seed = (Previous_Seed * 3 - 7) XOR Arbitrary_Value
+	unsigned char Is_Least_Significant_Bit_Set;
+	
+	// Use a 8-bit Galois LFSR to generate good pseudo-random numbers (see https://en.wikipedia.org/wiki/Linear-feedback_shift_register#Galois_LFSRs)
+	if (System_Random_Seed & 0x01) Is_Least_Significant_Bit_Set = 1;
+	else Is_Least_Significant_Bit_Set = 0;
+	System_Random_Seed >>= 1;
+	if (Is_Least_Significant_Bit_Set) System_Random_Seed ^= 0xB4;
+	
+	// Add some more randomness thanks to this unknown timer value
+	System_Random_Seed ^= TMR4;
+	
 	return System_Random_Seed;
 }
