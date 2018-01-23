@@ -30,7 +30,7 @@ $(1)-clean:
 
 $(1)-download: $(1)
 	cd ../PC/A7_Upload_Application && $(MAKE)
-	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex $(shell cat $(1)/Application_Name_On_A7.txt)
+	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex '$(shell cat $(1)/Application_Name_On_A7.txt)'
 endef
 
 # Compile everything (there is no need to explicitly depend on System because all applications depend on it yet)

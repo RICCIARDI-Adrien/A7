@@ -71,7 +71,7 @@ static void AESStepSubstituteBytes(unsigned char Pointer_Input_Buffer[][AES_STAT
 	Pointer_Input_Buffer_Bytes = (unsigned char *) Pointer_Input_Buffer;
 	Pointer_Output_Buffer_Bytes = (unsigned char *) Pointer_Output_Buffer;
 	
-	for (i = 0; i < AES_STATE_ROWS_COUNT * AES_STATE_COLUMNS_COUNT; i++)
+	for (i = 0; i < AES_BLOCK_SIZE; i++)
 	{
 		// Cache input byte value
 		Byte = *Pointer_Input_Buffer_Bytes;
