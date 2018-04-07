@@ -11,7 +11,7 @@
 /** Display the files on the screen.
  * @param String_Menu_Title The text to display on the first line.
  */
-void MenuShowFiles(unsigned char *String_Menu_Title);
+void MenuShowFiles(const unsigned char *String_Menu_Title);
 
 /** Load a program from the external EEPROM into the program memory and start it. */
 void MenuStartProgram(void);

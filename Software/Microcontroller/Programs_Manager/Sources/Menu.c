@@ -10,7 +10,7 @@
 //-------------------------------------------------------------------------------------------------
 // Public functions
 //-------------------------------------------------------------------------------------------------
-void MenuShowFiles(unsigned char *String_Menu_Title)
+void MenuShowFiles(const unsigned char *String_Menu_Title)
 {
 	unsigned char i;
 	
