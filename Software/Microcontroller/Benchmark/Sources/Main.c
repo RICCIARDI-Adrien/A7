@@ -46,6 +46,7 @@ void main(void)
 			break;
 			
 		default:
+			BenchmarkFloatingPointArithmetic();
 			break;
 	}
 	
