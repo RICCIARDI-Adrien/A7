@@ -25,7 +25,7 @@ void BenchmarkFloatingPointArithmetic(void)
 		Result = sqrt(Value);
 		
 		// Display value and corresponding result
-		sprintf(String_Result, "%.0f = %f\n", Value, Result);
+		sprintf(String_Result, "%.0f = %.4f\n", Value, Result);
 		SystemDisplayRenderTextString(String_Result);
 		SystemDisplayRenderFrameBuffer();
 		
