@@ -1,4 +1,4 @@
-/** @File System_Random.h
+/** @file System_Random.h
  * Generate pseudo-random numbers.
  * @author Adrien RICCIARDI
  */
@@ -12,7 +12,7 @@
 void SystemRandomInitialize(void);
 
 /** Generate a pseudo-random number.
- * @Return The pseudo-random number.
+ * @return The pseudo-random number.
  */
 unsigned char SystemRandomGetNumber(void);
 
