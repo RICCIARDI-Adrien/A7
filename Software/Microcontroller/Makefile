@@ -28,7 +28,7 @@ $(1)-clean:
 	@rm -rf $(1)/$(MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS)
 	cd $(1) && $$(MAKE) clean
 
-$(1)-download: $(1)
+$(1)-download:
 	cd ../PC/A7_Upload_Application && $(MAKE)
 	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex '$(shell cat $(1)/Application_Name_On_A7.txt)'
 endef
