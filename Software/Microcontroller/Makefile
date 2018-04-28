@@ -10,7 +10,7 @@ export MAIN_MAKEFILE_C_COMPILER_FLAGS = --chip=18F26K22 --objdir=$(MAIN_MAKEFILE
 # Find all directories (each application stands in a separate directory). Search only in the current directory (do not go into subdirectories), display only the file name with leading "./" removed, ignore "." file
 DIRECTORIES_LIST = $(sort $(shell find . -mindepth 1 -maxdepth 1 -type d -printf "%f "))
 # Remove directories that do not belong in the regular applications category
-APPLICATIONS_LIST = $(filter-out Programs_Manager System,$(DIRECTORIES_LIST))
+APPLICATIONS_LIST = $(filter-out System,$(DIRECTORIES_LIST))
 
 # Tell "make" to not match the rule names with the existing folders
 .PHONY: $(DIRECTORIES_LIST)
@@ -19,7 +19,7 @@ APPLICATIONS_LIST = $(filter-out Programs_Manager System,$(DIRECTORIES_LIST))
 # @param $(1) The application directory.
 define CREATE_APPLICATION_RULES =
 $(1): System
-	@printf "\033[33mCompiling $(1)...\033[0m\n"
+	@printf "\033[33mBuilding $(1)...\033[0m\n"
 	@# Make sure objects directory is present
 	@mkdir -p $(1)/$(MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS)
 	cd $(1) && $$(MAKE)
@@ -29,27 +29,22 @@ $(1)-clean:
 	@rm -rf $(1)/$(MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS)
 	cd $(1) && $$(MAKE) clean
 
+# Programs Manager can't be downloaded as it resides in another memory area than classic applications
+ifneq ("$(1)","Programs_Manager")
 $(1)-download:
 	cd ../PC/A7_Upload_Application && $(MAKE)
 	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex '$(shell cat $(1)/Application_Name_On_A7.txt)'
+endif
 endef
 
-# Compile everything (there is no need to explicitly depend on System because all applications depend on it yet)
-all: $(APPLICATIONS_LIST) Programs_Manager
+all: $(APPLICATIONS_LIST)
 	@printf "\033[32mSystem and all applications successfully built.\033[0m\n"
 
 # Clean everything (it works by modifying all words from the applications list to append "-clean" at their end)
-clean: $(APPLICATIONS_LIST:=-clean) Programs_Manager-clean System-clean
+clean: $(APPLICATIONS_LIST:=-clean) System-clean
 	@printf "\033[32mSystem and all applications successfully cleaned.\033[0m\n"
 
-# System and Programs Manager need specific rules because they can't be downloaded and System build is slightly different
-# Programs Manager must be explicitly compiled, it is not automatically compiled when executing "all" rule
-Programs_Manager: System
-	cd Programs_Manager && $(MAKE)
-
-Programs_Manager-clean:
-	cd Programs_Manager && $(MAKE) clean
-
+# System needs specific rules because it can't be downloaded and its build process is slightly different
 System:
 	cd System && $(MAKE)
 
