@@ -19,6 +19,7 @@ APPLICATIONS_LIST = $(filter-out Programs_Manager System,$(DIRECTORIES_LIST))
 # @param $(1) The application directory.
 define CREATE_APPLICATION_RULES =
 $(1): System
+	@printf "\033[33mCompiling $(1)...\033[0m\n"
 	@# Make sure objects directory is present
 	@mkdir -p $(1)/$(MAIN_MAKEFILE_APPLICATION_PATH_OBJECTS)
 	cd $(1) && $$(MAKE)
