@@ -46,6 +46,7 @@ clean: $(APPLICATIONS_LIST:=-clean) System-clean
 
 # System needs specific rules because it can't be downloaded and its build process is slightly different
 System:
+	@printf "\033[35mBuilding System library...\033[0m\n"
 	cd System && $(MAKE)
 
 System-clean:
