@@ -43,10 +43,9 @@ void MenuStartProgram(void)
 	SystemLedOn();
 	
 	// Display the "loading" message
-	SystemDisplayClearFrameBuffer();
-	SystemDisplaySetTextCursor(0, 0);
+	SystemDisplayClear();
 	SystemDisplayRenderTextString(STRING_MENU_START_PROGRAM_LOADING);
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	// Load the file from the external EEPROM into the program memory
 	File_Size = File_System_Files_Information[File_ID].Size;

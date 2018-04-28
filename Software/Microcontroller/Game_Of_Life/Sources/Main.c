@@ -176,7 +176,7 @@ static inline void MainDisplayWorld(void)
 {
 	unsigned char Cell_Row, Cell_Column, Sprite_Row = 0, Sprite_Column = 0;
 	
-	SystemDisplayClearFrameBuffer();
+	SystemDisplayClear();
 	
 	for (Cell_Row = 0; Cell_Row < MAIN_WORLD_HEIGHT_CELLS; Cell_Row++)
 	{
@@ -194,7 +194,7 @@ static inline void MainDisplayWorld(void)
 		Sprite_Column = 0;
 	}
 	
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 }
 
 //-------------------------------------------------------------------------------------------------

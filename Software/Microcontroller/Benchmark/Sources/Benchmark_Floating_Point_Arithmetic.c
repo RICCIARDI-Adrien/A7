@@ -17,8 +17,6 @@ void BenchmarkFloatingPointArithmetic(void)
 	
 	// Clear display and return display to home
 	SystemDisplayClear();
-	SystemDisplayClearFrameBuffer();
-	SystemDisplaySetTextCursor(0, 0);
 	
 	while (1)
 	{
@@ -27,7 +25,7 @@ void BenchmarkFloatingPointArithmetic(void)
 		// Display value and corresponding result
 		sprintf(String_Result, "%.0f = %.4f\n", Value, Result);
 		SystemDisplayRenderTextString(String_Result);
-		SystemDisplayRenderFrameBuffer();
+		SystemDisplayUpdate();
 		
 		Value++;
 	}

@@ -24,13 +24,11 @@
 /** Reset and configure the graphic display for operations. */
 void SystemDisplayInitialize(void);
 
-/** Clear the display. */
+/** Clear the internal frame buffer and return the text cursor to home position. */
 void SystemDisplayClear(void);
 
-/** Turn off all the internal frame buffer pixels. */
-void SystemDisplayClearFrameBuffer(void);
 /** Send the frame buffer content to the display. */
-void SystemDisplayRenderFrameBuffer(void);
+void SystemDisplayUpdate(void);
 
 /** Render a sprite in the frame buffer at the specified location.
  * @param X Sprite leftmost coordinate (must be in the display area).
@@ -56,7 +54,7 @@ void SystemDisplayWaitForFrameTimerEnd(void);
  */
 void SystemDisplaySetTextCursor(unsigned char X, unsigned char Y);
 /** Render an ASCII character at the current text cursor location and increment the cursor horizontal coordinate.
- * @param Character The character to display's ASCII code.
+ * @param Character The character to display ASCII code.
  * @note The character is not rendered if the cursor coordinates are out of cursor bounds.
  */
 void SystemDisplayRenderTextCharacter(unsigned char Character);

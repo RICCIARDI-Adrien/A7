@@ -14,8 +14,7 @@ void MenuShowFiles(const unsigned char *String_Menu_Title)
 {
 	unsigned char i;
 	
-	SystemDisplayClearFrameBuffer();
-	SystemDisplaySetTextCursor(0, 0);
+	SystemDisplayClear();
 	
 	// Display title
 	SystemDisplayRenderTextString((const unsigned char *) String_Menu_Title);
@@ -37,6 +36,6 @@ void MenuShowFiles(const unsigned char *String_Menu_Title)
 	// Display the exit command at the display bottom
 	SystemDisplaySetTextCursor(0, 7);
 	SystemDisplayRenderTextString(STRING_MENU_EXIT);
-		
-	SystemDisplayRenderFrameBuffer();
+	
+	SystemDisplayUpdate();
 }

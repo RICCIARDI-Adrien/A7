@@ -19,12 +19,12 @@ void main(void)
 	// Receive key
 	for (i = 0; i < AES_256_KEY_SIZE; i++) Key[i] = SystemSerialPortReadByte();
 	SystemDisplayRenderTextString("Received key.\n");
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	// Initialize operation
 	AES256CBCInitialize(Key); // TODO cipher and decipher support
 	SystemDisplayRenderTextString("Initialized engine.\n");
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	while (1)
 	{

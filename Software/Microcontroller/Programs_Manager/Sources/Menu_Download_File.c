@@ -51,13 +51,12 @@ void MenuDownloadFile(void)
 	Pointer_File_Information = &File_System_Files_Information[File_ID];
 	
 	// Display the "connecting" message
-	SystemDisplayClearFrameBuffer();
-	SystemDisplaySetTextCursor(0, 0);
+	SystemDisplayClear();
 	SystemDisplayRenderTextString(STRING_MENU_DOWNLOAD_FILE_CONNECTING);
 	// Display the "exit" message on the display bottom
 	//SystemDisplaySetTextCursor(0, SYSTEM_DISPLAY_TEXT_CHARACTER_HEIGHT - 1);
 	//SystemDisplayRenderTextString(STRING_MENU_EXIT); // TODO : hard to do due to no interrupts on the keyboard
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	// Initiate the connection
 	SystemSerialPortWriteByte(MENU_DOWNLOAD_FILE_PROTOCOL_CODE_START_DOWNLOADING);
@@ -69,7 +68,7 @@ void MenuDownloadFile(void)
 	// Display the "downloading" message
 	SystemDisplaySetTextCursor(0, 1);
 	SystemDisplayRenderTextString(STRING_MENU_DOWNLOAD_FILE_DOWNLOADING);
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	// Receive the file name
 	for (i = 0; i < FILE_SYSTEM_FILE_NAME_SIZE; i++) String_File_Name[i] = SystemSerialPortReadByte();

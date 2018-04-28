@@ -13,7 +13,7 @@ void BenchmarkRandomNumbersGenerator(void)
 	const unsigned char Sprite_Pixel = 0x01;
 	unsigned char X_Coordinate, Y_Coordinate;
 	
-	SystemDisplayClearFrameBuffer();
+	SystemDisplayClear();
 	
 	while (1)
 	{
@@ -23,6 +23,6 @@ void BenchmarkRandomNumbersGenerator(void)
 		
 		// Display the pixel
 		SystemDisplayRenderSprite(X_Coordinate, Y_Coordinate, &Sprite_Pixel, 1, 1);
-		SystemDisplayRenderFrameBuffer();
+		SystemDisplayUpdate();
 	}
 }

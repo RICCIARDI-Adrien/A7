@@ -63,7 +63,7 @@ void BenchmarkBouncingBalls(void)
 	while (1)
 	{
 		SystemDisplayStartFrameTimer();
-		SystemDisplayClearFrameBuffer();
+		SystemDisplayClear();
 		
 		// Handle ball moves
 		for (i = 0; i < BENCHMARK_BOUNCING_BALLS_COUNT; i++)
@@ -103,7 +103,7 @@ void BenchmarkBouncingBalls(void)
 			Pointer_Ball->Y += Pointer_Ball->Horizontal_Speed;
 		}
 		
-		SystemDisplayRenderFrameBuffer();
+		SystemDisplayUpdate();
 		SystemDisplayWaitForFrameTimerEnd();
 	}
 }

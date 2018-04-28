@@ -19,9 +19,8 @@ Start:
 	while (1)
 	{
 		// Display menu
-		SystemDisplayClearFrameBuffer();
+		SystemDisplayClear();
 		// Menu title
-		SystemDisplaySetTextCursor(0, 0);
 		SystemDisplayRenderTextString(STRING_MENU_MAIN_TITLE);
 		// Menu items
 		SystemDisplaySetTextCursor(0, 2);
@@ -31,7 +30,7 @@ Start:
 		SystemDisplaySetTextCursor(0, 4);
 		SystemDisplayRenderTextString(STRING_MENU_MAIN_ITEM_3);
 		// Render to screen
-		SystemDisplayRenderFrameBuffer();
+		SystemDisplayUpdate();
 		
 		// Wait for a menu item to be selected
 		while (1)

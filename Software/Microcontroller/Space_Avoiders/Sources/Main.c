@@ -87,7 +87,7 @@ void main(void)
 	
 	while (1)
 	{
-		SystemDisplayClearFrameBuffer();
+		SystemDisplayClear();
 		
 		SystemDisplayRenderSprite(0, 0, Sprites[SPRITE_ID_INVADER_0].Pointer_Pixels_Data, Sprites[SPRITE_ID_INVADER_0].Width, Sprites[SPRITE_ID_INVADER_0].Height);
 		SystemDisplayRenderSprite(16, 0, Sprites[SPRITE_ID_INVADER_1].Pointer_Pixels_Data, Sprites[SPRITE_ID_INVADER_1].Width, Sprites[SPRITE_ID_INVADER_1].Height);
@@ -96,7 +96,7 @@ void main(void)
 		SystemDisplayRenderSprite(64, 0, Sprites[SPRITE_ID_INVADER_4].Pointer_Pixels_Data, Sprites[SPRITE_ID_INVADER_4].Width, Sprites[SPRITE_ID_INVADER_4].Height);
 		SystemDisplayRenderSprite(80, 0, Sprites[SPRITE_ID_INVADER_5].Pointer_Pixels_Data, Sprites[SPRITE_ID_INVADER_5].Width, Sprites[SPRITE_ID_INVADER_5].Height);
 		
-		SystemDisplayRenderFrameBuffer();
+		SystemDisplayUpdate();
 		
 		while (1);
 	}

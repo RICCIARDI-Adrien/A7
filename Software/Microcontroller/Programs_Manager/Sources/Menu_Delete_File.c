@@ -34,12 +34,11 @@ void MenuDeleteFile(void)
 	}
 	
 	// Ask the user for confirmation
-	SystemDisplayClearFrameBuffer();
-	SystemDisplaySetTextCursor(0, 0);
+	SystemDisplayClear();
 	SystemDisplayRenderTextString(STRING_MENU_DELETE_FILE_CONFIRMATION_MESSAGE_1);
 	SystemDisplaySetTextCursor(0, 1);
 	SystemDisplayRenderTextString(STRING_MENU_DELETE_FILE_CONFIRMATION_MESSAGE_2);
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	while (1)
 	{
 		Character = SystemKeyboardReadCharacterNoInterrupt();

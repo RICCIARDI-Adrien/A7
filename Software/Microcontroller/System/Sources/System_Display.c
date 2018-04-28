@@ -266,40 +266,22 @@ void SystemDisplayInitialize(void)
 	
 	// Configure both controllers
 	SystemDisplayClear();
+	SystemDisplayUpdate();
 	for (Controller_ID = 0; Controller_ID < 2; Controller_ID++) SystemDisplayWriteByte(Controller_ID, 1, 0x3F); // Turn display on
 }
 
 void SystemDisplayClear(void)
 {
-	unsigned char Controller_ID, Row, Column;
-	
-	// Access all controllers
-	for (Controller_ID = 0; Controller_ID < 2; Controller_ID++)
-	{
-		// Turn off all pixels
-		for (Row = 0; Row < SYSTEM_DISPLAY_HEIGHT / 8; Row++)
-		{
-			// Set row number
-			SystemDisplayWriteByte(Controller_ID, 1, 0xB8 | Row);
-			
-			// Make column number start from zero
-			SystemDisplayWriteByte(Controller_ID, 1, 0x40);
-			
-			// Clear all pixels
-			for (Column = 0; Column < SYSTEM_DISPLAY_WIDTH / 2; Column++) SystemDisplayWriteByte(Controller_ID, 0, 0);
-		}
-	}
-}
-
-void SystemDisplayClearFrameBuffer(void)
-{
 	unsigned short i;
 	
 	// Clear frame buffer (no need to clear the display because it will be fully overwritten by the frame buffer content)
 	for (i = 0; i < sizeof(System_Display_Frame_Buffer); i++) System_Display_Frame_Buffer[i] = 0;
+	
+	// Return cursor to home location
+	SystemDisplaySetTextCursor(0, 0);
 }
 
-void SystemDisplayRenderFrameBuffer(void)
+void SystemDisplayUpdate(void)
 {
 	unsigned char Controller_ID, Row, Column;
 	unsigned short i = 0;

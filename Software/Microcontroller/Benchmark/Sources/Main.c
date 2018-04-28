@@ -21,7 +21,7 @@ static inline unsigned char MainShowMenu(void)
 	SystemDisplayRenderTextString(STRINGS_MENU_FIRST_CHOICE);
 	SystemDisplayRenderTextString(STRINGS_MENU_SECOND_CHOICE);
 	SystemDisplayRenderTextString(STRINGS_MENU_THIRD_CHOICE);
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	// Wait for the user to press a valid key
 	do

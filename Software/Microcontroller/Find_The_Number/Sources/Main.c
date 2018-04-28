@@ -44,7 +44,7 @@ static inline void MainReadPlayerNumber(unsigned char *String_Number)
 	
 	// Display the user prompt
 	SystemDisplayRenderTextString(STRINGS_INSERT_PLAYER_NUMBER);
-	SystemDisplayRenderFrameBuffer();
+	SystemDisplayUpdate();
 	
 	while (1)
 	{
@@ -63,7 +63,7 @@ static inline void MainReadPlayerNumber(unsigned char *String_Number)
 				
 				// Display the backspace to erase the current line last character
 				SystemDisplayRenderTextCharacter('\b');
-				SystemDisplayRenderFrameBuffer();
+				SystemDisplayUpdate();
 				break;
 				
 			// New line
@@ -76,7 +76,7 @@ static inline void MainReadPlayerNumber(unsigned char *String_Number)
 				
 				// Display the new line character
 				SystemDisplayRenderTextCharacter('\n');
-				SystemDisplayRenderFrameBuffer();
+				SystemDisplayUpdate();
 				
 				// Shift the string to the right and fill leftmost empty digits with ASCII '0' to be able to compare the string with the random number one
 				// Fill number beginning with zeroes
@@ -113,7 +113,7 @@ static inline void MainReadPlayerNumber(unsigned char *String_Number)
 				
 				// Display the digit
 				SystemDisplayRenderTextCharacter(Character);
-				SystemDisplayRenderFrameBuffer();
+				SystemDisplayUpdate();
 				break;
 		}
 	}
@@ -136,8 +136,7 @@ void main(void)
 		MainGenerateRandomNumber(String_Number_To_Find);
 		
 		// Clean the display and return cursor to home
-		SystemDisplayClearFrameBuffer();
-		SystemDisplaySetTextCursor(0, 0);
+		SystemDisplayClear();
 		
 		while (1)
 		{
@@ -154,7 +153,7 @@ void main(void)
 			else
 			{
 				SystemDisplayRenderTextString(STRINGS_PLAYER_WON);
-				SystemDisplayRenderFrameBuffer();
+				SystemDisplayUpdate();
 				break;
 			}
 			
@@ -162,13 +161,13 @@ void main(void)
 			SystemDisplayRenderTextString(STRINGS_REMAINING_ATTEMPTS);
 			SystemDisplayRenderTextString((const unsigned char *) itoa(String_Player_Number, Remaining_Attempts, 10)); // Recycle String_Player_Number
 			SystemDisplayRenderTextCharacter('\n');
-			SystemDisplayRenderFrameBuffer();
+			SystemDisplayUpdate();
 			
 			// Did the player loose ?
 			if (Remaining_Attempts == 0) 
 			{
 				SystemDisplayRenderTextString(STRINGS_PLAYER_LOST);
-				SystemDisplayRenderFrameBuffer();
+				SystemDisplayUpdate();
 				break;
 			}
 		}
