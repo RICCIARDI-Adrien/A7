@@ -20,13 +20,14 @@ static inline unsigned char MainShowMenu(void)
 	SystemDisplayRenderTextString(STRINGS_MENU_TITLE);
 	SystemDisplayRenderTextString(STRINGS_MENU_FIRST_CHOICE);
 	SystemDisplayRenderTextString(STRINGS_MENU_SECOND_CHOICE);
+	SystemDisplayRenderTextString(STRINGS_MENU_THIRD_CHOICE);
 	SystemDisplayRenderFrameBuffer();
 	
 	// Wait for the user to press a valid key
 	do
 	{
 		Key = SystemKeyboardReadCharacter();
-	} while ((Key < '1') || (Key > '2'));
+	} while ((Key < '1') || (Key > '3'));
 	
 	return Key - '1';
 }
@@ -45,8 +46,15 @@ void main(void)
 			BenchmarkBouncingBalls();
 			break;
 			
-		default:
+		case 1:
 			BenchmarkFloatingPointArithmetic();
+			break;
+			
+		case 2:
+			BenchmarkRandomNumbersGenerator();
+			break;
+			
+		default:
 			break;
 	}
 	
