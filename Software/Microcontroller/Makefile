@@ -32,10 +32,18 @@ $(1)-clean:
 # Programs Manager can't be downloaded as it resides in another memory area than classic applications
 ifneq ("$(1)","Programs_Manager")
 $(1)-download:
+	@# Make sure a target name has been provided
+	@if [ -z "$(call GetTargetApplicationName,$(1))" ]; then printf "\033[31mError : no target application name provided. Please set the 'TARGET_APPLICATION_NAME' variable in the application makefile.\033[0m\n"; false; fi
 	cd ../PC/A7_Upload_Application && $(MAKE)
-	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex '$(shell cat $(1)/Application_Name_On_A7.txt)'
+	../Binaries/A7_Upload_Application $(A7_APPLICATION_DOWNLOAD_SERIAL_PORT_DEVICE) ../Binaries/$(1).hex '$(call GetTargetApplicationName,$(1))'
 endif
 endef
+
+# Extract file name from the application makefile. No indentation can be used because it would add some characters to the output result
+define GetTargetApplicationName =
+$(shell grep "TARGET_APPLICATION_NAME = " $(1)/Makefile | cut -c 27-)
+endef
+
 
 all: $(APPLICATIONS_LIST)
 	@printf "\033[32mSystem and all applications successfully built.\033[0m\n"
