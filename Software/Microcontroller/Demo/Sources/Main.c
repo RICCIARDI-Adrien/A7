@@ -5,10 +5,33 @@
 #include <System.h>
 
 //-------------------------------------------------------------------------------------------------
+// Private constants
+//-------------------------------------------------------------------------------------------------
+/** How many demos are available. */
+#define DEMOS_COUNT (sizeof(Demo_Functions) / sizeof(Demo_Functions[0]))
+
+//-------------------------------------------------------------------------------------------------
+// Private types
+//-------------------------------------------------------------------------------------------------
+/** A demo function callback. */
+typedef void (*TDemoFunction)(void);
+
+//-------------------------------------------------------------------------------------------------
+// Prototypes
+//-------------------------------------------------------------------------------------------------
+static void DemoFillScreenUpToDown(void);
+
+//-------------------------------------------------------------------------------------------------
 // Private variables
 //-------------------------------------------------------------------------------------------------
 /** Keep the last pressed key. */
-static unsigned char Last_Pressed_Key;
+static unsigned char Last_Pressed_Key = 0;
+
+/** All available demos. */
+TDemoFunction Demo_Functions[] =
+{
+	DemoFillScreenUpToDown
+};
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -42,19 +65,20 @@ static void DemoFillScreenUpToDown(void)
 //-------------------------------------------------------------------------------------------------
 void main(void)
 {
-	SystemInitialize();
+	unsigned char i = 0;
 	
-	// Reinitialize the variable each time the demo is called, or it will contain the last hit key, which may be the exiting character...
-	Last_Pressed_Key = 0;
+	SystemInitialize();
 	
 	while (1)
 	{
 		SystemDisplayClear();
 		
-		DemoFillScreenUpToDown();
+		// Start next demo
+		Demo_Functions[i]();
+		i++;
+		if (i >= DEMOS_COUNT) i = 0;
 		
-		
-		// Change transition or quit program according to pressed key
+		// Change demo or quit program according to pressed key
 		if (Last_Pressed_Key == SYSTEM_KEYBOARD_KEY_CODE_ESCAPE) SystemExitProgram();
 	}
 }
