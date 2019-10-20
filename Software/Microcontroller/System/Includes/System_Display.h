@@ -33,11 +33,19 @@ void SystemDisplayUpdate(void);
 /** Render a sprite in the frame buffer at the specified location.
  * @param X Sprite leftmost coordinate (must be in the display area).
  * @param Y Sprite topmost coordinate (must be in the display area).
- * @param Pointer_Sprite_Pixels Byte array of sprite pixels. This array must be arranged in the display module native format : a byte represents 8 consecutive vertical pixels, bit 7 is the upper pixel and bit 0 is the downer pixel.
+ * @param Pointer_Sprite_Pixels Byte array of sprite pixels. This array must be arranged in the display module native format : a byte represents 8 consecutive vertical pixels, bit 7 is the downer pixel and bit 0 is the upper pixel.
  * @param Width Sprite width in pixels. Value can be from 1 to the display width.
  * @param Height Sprite height in pixels. Value can be from 1 to the display height.
  */
 void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned char *Pointer_Sprite_Pixels, unsigned char Width, unsigned char Height);
+
+/** Turn a specific pixel on or off.
+ * @param X The pixel X coordinate, in range [0; SYSTEM_DISPLAY_WIDTH[.
+ * @param Y The pixel Y coordinate, in rage [0; SYSTEM_DISPLAY_HEIGHT[.
+ * @param Is_Lighted Set to 1 to light the pixel, set to 0 to turn the pixel off.
+ * @note This function does nothing if the specified coordinates are out of display bounds.
+ */
+void SystemDisplaySetPixelState(unsigned char X, unsigned char Y, unsigned char Is_Lighted);
 
 /** Start a timer lasting a frame time. */
 void SystemDisplayStartFrameTimer(void);

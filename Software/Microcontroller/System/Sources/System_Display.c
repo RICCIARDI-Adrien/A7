@@ -351,6 +351,30 @@ void SystemDisplayRenderSprite(unsigned char X, unsigned char Y, const unsigned 
 	}
 }
 
+void SystemDisplaySetPixelState(unsigned char X, unsigned char Y, unsigned char Is_Lighted)
+{
+	unsigned char Y_Remainder, Y_Quotient, *Pointer_Frame_Buffer, Mask, Byte;
+	
+	// Do nothing if coordinates are out of display bounds
+	if ((X >= SYSTEM_DISPLAY_WIDTH) || (Y >= SYSTEM_DISPLAY_HEIGHT)) return;
+	
+	// Find the byte the pixel is located in
+	Y_Quotient = Y >> 3;
+	Y_Remainder = Y - (Y_Quotient << 3); // If the remainder is 0, the pixel coordinate is aligned with the frame buffer row, if not, some shifting must be done
+	
+	// Get direct access to the byte
+	Pointer_Frame_Buffer = (unsigned char *) (System_Display_Frame_Buffer + (Y_Quotient * SYSTEM_DISPLAY_WIDTH + X)); // Each frame buffer row contains 8 pixels rows, so divide Y by 8
+	
+	// Determine the pixel position inside the byte (bit 7 is the downer one, bit 0 is the upper one)
+	Mask = 0x01 << Y_Remainder;
+	
+	// Turn the pixel on or off
+	Byte = *Pointer_Frame_Buffer;
+	if (Is_Lighted) Byte |= Mask;
+	else Byte &= ~Mask;
+	*Pointer_Frame_Buffer = Byte;
+}
+
 void SystemDisplayStartFrameTimer(void)
 {
 	// Configure timer 5 to overflow 50ms later
