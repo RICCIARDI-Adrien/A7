@@ -23,6 +23,7 @@ static void DemoFillScreenUpToDown(void);
 static void DemoFillScreenDownToUp(void);
 static void DemoFillScreenLeftToRight(void);
 static void DemoFillScreenRightToLeft(void);
+static void DemoFillScreenSquarePattern(void);
 
 //-------------------------------------------------------------------------------------------------
 // Private variables
@@ -36,7 +37,8 @@ TDemoFunction Demo_Functions[] =
 	DemoFillScreenUpToDown,
 	DemoFillScreenDownToUp,
 	DemoFillScreenLeftToRight,
-	DemoFillScreenRightToLeft
+	DemoFillScreenRightToLeft,
+	DemoFillScreenSquarePattern
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -136,6 +138,88 @@ static void DemoFillScreenRightToLeft(void)
 			}
 		}
 	}
+}
+
+/** Fill the screen following a square path. */
+static void DemoFillScreenSquarePattern(void)
+{
+	unsigned char Current_X, Current_Y, Starting_X = 0, Starting_Y = 0, Ending_X = SYSTEM_DISPLAY_WIDTH - 1, Ending_Y = SYSTEM_DISPLAY_HEIGHT - 1;
+	unsigned short Remaining_Pixels = SYSTEM_DISPLAY_WIDTH * SYSTEM_DISPLAY_HEIGHT;
+	
+	do
+	{
+		// Draw left to right row
+		Current_Y = Starting_Y;
+		for (Current_X = Starting_X; Current_X <= Ending_X; Current_X++)
+		{
+			SystemDisplaySetPixelState(Current_X, Current_Y, 1);
+			SystemDisplayUpdate();
+			Remaining_Pixels--;
+			
+			// Exit if user pressed a key
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+		// Upper row has been completely filled
+		Starting_Y++;
+		
+		// Draw up to down column
+		Current_X = Ending_X;
+		for (Current_Y = Starting_Y; Current_Y <= Ending_Y; Current_Y++)
+		{
+			SystemDisplaySetPixelState(Current_X, Current_Y, 1);
+			SystemDisplayUpdate();
+			Remaining_Pixels--;
+			
+			// Exit if user pressed a key
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+		// Right side column has been completely filled
+		Ending_X--;
+		
+		// Draw right to left row
+		Current_Y = Ending_Y;
+		for (Current_X = Ending_X; (Current_X >= Starting_X) && (Current_X != 255); Current_X--)
+		{
+			SystemDisplaySetPixelState(Current_X, Current_Y, 1);
+			SystemDisplayUpdate();
+			Remaining_Pixels--;
+			
+			// Exit if user pressed a key
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+		// Lower row has been completely filled
+		Ending_Y--;
+		
+		// Draw down to up column
+		Current_X = Starting_X;
+		for (Current_Y = Ending_Y; (Current_Y >= Starting_Y) && (Current_Y != 255); Current_Y--)
+		{
+			SystemDisplaySetPixelState(Current_X, Current_Y, 1);
+			SystemDisplayUpdate();
+			Remaining_Pixels--;
+			
+			// Exit if user pressed a key
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+		// Left side column has been completely filled
+		Starting_X++;
+	} while (Remaining_Pixels > 0);
 }
 
 //-------------------------------------------------------------------------------------------------
