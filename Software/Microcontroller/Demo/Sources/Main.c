@@ -2,6 +2,7 @@
  * Determine which demo to display and display it.
  * @author Adrien RICCIARDI
  */
+#include <string.h>
 #include <System.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -9,6 +10,9 @@
 //-------------------------------------------------------------------------------------------------
 /** How many demos are available. */
 #define DEMOS_COUNT (sizeof(Demo_Functions) / sizeof(Demo_Functions[0]))
+
+/** The maximum reachable height in pixels for a falling snow column. */
+#define DEMO_FALLING_SNOW_MAXIMUM_COLUMN_HEIGHT 48
 
 //-------------------------------------------------------------------------------------------------
 // Private types
@@ -24,6 +28,7 @@ static void DemoFillScreenDownToUp(void);
 static void DemoFillScreenLeftToRight(void);
 static void DemoFillScreenRightToLeft(void);
 static void DemoFillScreenSquarePattern(void);
+static void DemoFallingSnow(void);
 
 //-------------------------------------------------------------------------------------------------
 // Private variables
@@ -38,7 +43,8 @@ TDemoFunction Demo_Functions[] =
 	DemoFillScreenDownToUp,
 	DemoFillScreenLeftToRight,
 	DemoFillScreenRightToLeft,
-	DemoFillScreenSquarePattern
+	DemoFillScreenSquarePattern,
+	DemoFallingSnow
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -220,6 +226,60 @@ static void DemoFillScreenSquarePattern(void)
 		// Left side column has been completely filled
 		Starting_X++;
 	} while (Remaining_Pixels > 0);
+}
+
+/** Falling and stacking snow. */
+static void DemoFallingSnow(void)
+{
+	unsigned char X, Y, Stacks_Height[SYSTEM_DISPLAY_WIDTH], Ending_Y; // No need to use "static" keyword to put Stacks_Height array out of stack because PIC compiler will allocate it in standard RAM
+	unsigned short Remaining_Snowflakes = SYSTEM_DISPLAY_WIDTH * DEMO_FALLING_SNOW_MAXIMUM_COLUMN_HEIGHT;
+	
+	// Reset heights
+	memset(Stacks_Height, 0, sizeof(Stacks_Height));
+	
+	while (Remaining_Snowflakes > 0)
+	{
+		// Select next column to fill (it must not be completely filled)
+		do
+		{
+			X = SystemRandomGetNumber() % SYSTEM_DISPLAY_WIDTH;
+		} while (Stacks_Height[X] >= DEMO_FALLING_SNOW_MAXIMUM_COLUMN_HEIGHT);
+
+		// Initialize falling boundaries
+		Y = 0;
+		Ending_Y = SYSTEM_DISPLAY_HEIGHT - 1 - Stacks_Height[X]; // Compute the number of rows to cross
+		
+		// Simulate the falling snowflake
+		while (1)
+		{
+			// Show snowflake
+			SystemDisplaySetPixelState(X, Y, 1);
+			SystemDisplayUpdate();
+			__delay_ms(200); // Let enough time for the pixel to be turned on (it takes about 200ms on A7 STN LCD display)
+			
+			// Stop falling when the top of the column is reached
+			if (Y == Ending_Y) break;
+			
+			// Hide trace
+			SystemDisplaySetPixelState(X, Y, 0);
+			SystemDisplayUpdate();
+			
+			// Go to lower row
+			Y++;
+			
+			// Exit if user pressed a key
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+		
+		// Update column height
+		Stacks_Height[X]++;
+		
+		Remaining_Snowflakes--;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
