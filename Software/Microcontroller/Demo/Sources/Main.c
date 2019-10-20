@@ -20,6 +20,7 @@ typedef void (*TDemoFunction)(void);
 // Prototypes
 //-------------------------------------------------------------------------------------------------
 static void DemoFillScreenUpToDown(void);
+static void DemoFillScreenDownToUp(void);
 
 //-------------------------------------------------------------------------------------------------
 // Private variables
@@ -30,18 +31,43 @@ static unsigned char Last_Pressed_Key = 0;
 /** All available demos. */
 TDemoFunction Demo_Functions[] =
 {
-	DemoFillScreenUpToDown
+	DemoFillScreenUpToDown,
+	DemoFillScreenDownToUp
 };
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
-/** Fill the screen with characters from up to bottom. */
+/** Fill the screen from top to bottom. */
 static void DemoFillScreenUpToDown(void)
 {
 	unsigned char X, Y;
 	
 	for (Y = 0; Y < SYSTEM_DISPLAY_HEIGHT; Y++)
+	{
+		for (X = 0; X < SYSTEM_DISPLAY_WIDTH / 2; X++)
+		{
+			// Update screen
+			SystemDisplaySetPixelState(X, Y, 1); // Set leftmost pixel
+			SystemDisplaySetPixelState(SYSTEM_DISPLAY_WIDTH - 1 - X, Y, 1); // Set rightmost pixel
+			SystemDisplayUpdate();
+			
+			// Exit if a key is pressed
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+	}
+}
+
+/** Fill the screen from bottom to top. */
+static void DemoFillScreenDownToUp(void)
+{
+	unsigned char X, Y;
+	
+	for (Y = SYSTEM_DISPLAY_HEIGHT - 1; Y != 255 ; Y--)
 	{
 		for (X = 0; X < SYSTEM_DISPLAY_WIDTH / 2; X++)
 		{
