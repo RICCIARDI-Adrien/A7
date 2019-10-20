@@ -21,6 +21,7 @@ typedef void (*TDemoFunction)(void);
 //-------------------------------------------------------------------------------------------------
 static void DemoFillScreenUpToDown(void);
 static void DemoFillScreenDownToUp(void);
+static void DemoFillScreenLeftToRight(void);
 
 //-------------------------------------------------------------------------------------------------
 // Private variables
@@ -32,7 +33,8 @@ static unsigned char Last_Pressed_Key = 0;
 TDemoFunction Demo_Functions[] =
 {
 	DemoFillScreenUpToDown,
-	DemoFillScreenDownToUp
+	DemoFillScreenDownToUp,
+	DemoFillScreenLeftToRight
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -74,6 +76,30 @@ static void DemoFillScreenDownToUp(void)
 			// Update screen
 			SystemDisplaySetPixelState(X, Y, 1); // Set leftmost pixel
 			SystemDisplaySetPixelState(SYSTEM_DISPLAY_WIDTH - 1 - X, Y, 1); // Set rightmost pixel
+			SystemDisplayUpdate();
+			
+			// Exit if a key is pressed
+			if (SystemKeyboardIsKeyAvailable())
+			{
+				Last_Pressed_Key = SystemKeyboardReadCharacter();
+				return;
+			}
+		}
+	}
+}
+
+/** Fill the screen from left to right. */
+static void DemoFillScreenLeftToRight(void)
+{
+	unsigned char X, Y;
+	
+	for (X = 0; X < SYSTEM_DISPLAY_WIDTH; X++)
+	{
+		for (Y = 0; Y < SYSTEM_DISPLAY_HEIGHT / 2; Y++)
+		{
+			// Update screen
+			SystemDisplaySetPixelState(X, Y, 1); // Set upper pixel
+			SystemDisplaySetPixelState(X, SYSTEM_DISPLAY_HEIGHT - 1 - Y, 1); // Set downer pixel
 			SystemDisplayUpdate();
 			
 			// Exit if a key is pressed
